@@ -2,12 +2,24 @@
 
 import { removeProject } from "@/app/admin/actions";
 
-export function DeleteButton({ id }: { id: number }) {
+/**
+ * Botón de borrado con confirmación. Genérico: recibe la server action a
+ * ejecutar (por defecto `removeProject`, para no romper los usos existentes).
+ */
+export function DeleteButton({
+  id,
+  action = removeProject,
+  confirmMessage = "¿Borrar este elemento? No se puede deshacer.",
+}: {
+  id: number;
+  action?: (formData: FormData) => void | Promise<void>;
+  confirmMessage?: string;
+}) {
   return (
     <form
-      action={removeProject}
+      action={action}
       onSubmit={(e) => {
-        if (!confirm("¿Borrar este proyecto? No se puede deshacer.")) {
+        if (!confirm(confirmMessage)) {
           e.preventDefault();
         }
       }}

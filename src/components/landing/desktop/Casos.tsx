@@ -1,10 +1,10 @@
 import { s } from "../style";
 import { PlayCircle } from "../icons";
-import { CASOS, SITE } from "@/lib/landing-data";
+import { SITE, type Caso } from "@/lib/landing-data";
 
 const VTITLE = "writing-mode:vertical-rl;font-family:Bootzy;font-weight:400;font-size:clamp(40px,5.4vw,88px);letter-spacing:0.04em;text-transform:uppercase;color:#f5f3ec";
 
-export function Casos({ onOpen }: { onOpen: (key: string) => void }) {
+export function Casos({ casos, onOpen }: { casos: Caso[]; onOpen: (key: string) => void }) {
   return (
     <section id="casos" style={s("background:#0d0d0d;color:#f5f3ec;padding:clamp(44px,5.5vw,84px) clamp(24px,5vw,72px) clamp(40px,5vw,72px)")}>
       <div style={s("max-width:1560px;margin:0 auto;display:flex;gap:clamp(22px,3vw,52px);align-items:stretch")}>
@@ -22,7 +22,7 @@ export function Casos({ onOpen }: { onOpen: (key: string) => void }) {
 
         {/* Cards con hover-expand */}
         <div style={s("flex:1;min-width:0;display:flex;gap:clamp(12px,1.4vw,22px);height:clamp(430px,60vh,640px)")}>
-          {CASOS.map((c) => (
+          {casos.map((c) => (
             <div
               key={c.key}
               className="caso-card"

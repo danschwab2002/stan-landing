@@ -1,7 +1,16 @@
 import { s } from "../style";
-import { DISCIPLINES, SITE } from "@/lib/landing-data";
+import { ArrowRight } from "../icons";
+import { casosByDiscipline, SITE, type Caso, type Discipline } from "@/lib/landing-data";
 
-export function QueHacemos({ onOpen }: { onOpen: (key: string) => void }) {
+export function QueHacemos({
+  disciplines,
+  casos,
+  onOpen,
+}: {
+  disciplines: Discipline[];
+  casos: Caso[];
+  onOpen: (key: string) => void;
+}) {
   return (
     <section id="work" style={s("background:#0d0d0d;color:#f5f3ec;padding:clamp(48px,6vw,88px) clamp(24px,5vw,72px) clamp(40px,5vw,72px)")}>
       <div style={s("max-width:1460px;margin:0 auto")}>
@@ -14,8 +23,10 @@ export function QueHacemos({ onOpen }: { onOpen: (key: string) => void }) {
         </div>
 
         <div style={s("margin-top:clamp(40px,5vw,72px);display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:clamp(22px,2.6vw,44px)")}>
-          {DISCIPLINES.map((d) => {
-            const clickable = Boolean(d.detail);
+          {disciplines.map((d) => {
+            // Clickeable si tiene detalle propio o si hay casos de esa área (G11).
+            const nCasos = casosByDiscipline(d.key, casos).length;
+            const clickable = Boolean(d.detail) || nCasos > 0;
             return (
               <div
                 key={d.key}
@@ -31,6 +42,11 @@ export function QueHacemos({ onOpen }: { onOpen: (key: string) => void }) {
                     <li key={it} style={s("font-size:13px;color:rgba(245,243,236,0.72)")}>{it}</li>
                   ))}
                 </ul>
+                {clickable ? (
+                  <span style={s("display:inline-flex;align-items:center;gap:9px;margin-top:18px;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-acid)")}>
+                    Ver área <ArrowRight width={34} height={10} stroke="var(--stan-acid)" />
+                  </span>
+                ) : null}
               </div>
             );
           })}

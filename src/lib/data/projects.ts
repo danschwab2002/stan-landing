@@ -1,6 +1,11 @@
 import { and, asc, eq } from "drizzle-orm";
 import { db, ensureDb } from "@/lib/db";
-import { projects, type NewProject, type Project } from "@/lib/db/schema";
+import {
+  projects,
+  projectDisciplines,
+  type NewProject,
+  type Project,
+} from "@/lib/db/schema";
 
 /** Todos los proyectos, ordenados (vista del CMS). */
 export async function getAllProjects(): Promise<Project[]> {
@@ -60,5 +65,31 @@ export async function updateProject(id: number, data: Partial<NewProject>): Prom
 
 export async function deleteProject(id: number): Promise<void> {
   await ensureDb();
+  // Limpiamos los vínculos M2M a mano (no dependemos del PRAGMA foreign_keys).
+  await db.delete(projectDisciplines).where(eq(projectDisciplines.projectId, id));
   await db.delete(projects).where(eq(projects.id, id));
+}
+
+/** IDs de las disciplinas vinculadas a un proyecto (para pre-cargar el multi-select). */
+export async function getProjectDisciplineIds(projectId: number): Promise<number[]> {
+  await ensureDb();
+  const rows = await db
+    .select({ disciplineId: projectDisciplines.disciplineId })
+    .from(projectDisciplines)
+    .where(eq(projectDisciplines.projectId, projectId));
+  return rows.map((r) => r.disciplineId);
+}
+
+/** Reemplaza el set de disciplinas de un proyecto (borra todo e inserta el nuevo set). */
+export async function setProjectDisciplines(
+  projectId: number,
+  disciplineIds: number[]
+): Promise<void> {
+  await ensureDb();
+  await db.delete(projectDisciplines).where(eq(projectDisciplines.projectId, projectId));
+  const clean = [...new Set(disciplineIds)].filter((n) => Number.isFinite(n));
+  if (clean.length === 0) return;
+  await db
+    .insert(projectDisciplines)
+    .values(clean.map((disciplineId) => ({ projectId, disciplineId })));
 }

@@ -1,6 +1,6 @@
 import { s } from "../style";
 import { ArrowLeft, ArrowRight, PlayCircle } from "../icons";
-import type { Caso } from "@/lib/landing-data";
+import { disciplineTitle, type Caso, type Discipline } from "@/lib/landing-data";
 
 const VTITLE = "writing-mode:vertical-rl;font-family:Bootzy;font-weight:400;font-size:clamp(38px,7vh,80px);letter-spacing:0.04em;text-transform:uppercase;color:#f5f3ec";
 
@@ -19,7 +19,24 @@ function OverlayNav() {
   );
 }
 
-export function CasoOverlay({ caso, onClose }: { caso: Caso; onClose: () => void }) {
+export function CasoOverlay({
+  caso,
+  related,
+  disciplines,
+  onOpenCaso,
+  onOpenDisc,
+  onClose,
+}: {
+  caso: Caso;
+  related?: Caso;
+  disciplines: Discipline[];
+  onOpenCaso?: (key: string) => void;
+  onOpenDisc?: (key: string) => void;
+  onClose: () => void;
+}) {
+  // Área del caso relacionado para el "siguiente proyecto" (feedback Adriano 20/07)
+  const relatedArea = related?.disciplines?.[0] ? disciplineTitle(related.disciplines[0], disciplines) : null;
+  const areas = caso.disciplines ?? []; // navegación cruzada caso → sus áreas (G11)
   return (
     <div style={s("position:fixed;inset:0;z-index:70;background:#0d0d0d;color:#f5f3ec;overflow:auto;font-family:var(--font-grotesk)")}>
       <OverlayNav />
@@ -52,7 +69,40 @@ export function CasoOverlay({ caso, onClose }: { caso: Caso; onClose: () => void
         {/* Ficha */}
         <div style={s("display:flex;flex-direction:column")}>
           <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.6);margin-bottom:14px")}>{caso.tag}</div>
-          <h2 style={s("margin:0 0 20px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:clamp(34px,4.6vw,64px);line-height:0.96")}>{caso.title}</h2>
+          <h2 style={s("margin:0 0 18px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:clamp(34px,4.6vw,64px);line-height:0.96")}>{caso.title}</h2>
+          {caso.client || caso.year ? (
+            <div style={s("display:flex;flex-wrap:wrap;gap:clamp(20px,3vw,44px);margin:0 0 20px")}>
+              {caso.client ? (
+                <div>
+                  <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5);margin-bottom:5px")}>Cliente</div>
+                  <div style={s("font-size:clamp(13px,1vw,15px);color:#f5f3ec")}>{caso.client}</div>
+                </div>
+              ) : null}
+              {caso.year ? (
+                <div>
+                  <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5);margin-bottom:5px")}>Año</div>
+                  <div style={s("font-size:clamp(13px,1vw,15px);color:#f5f3ec")}>{caso.year}</div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {areas.length > 0 && onOpenDisc ? (
+            <div style={s("margin:0 0 20px")}>
+              <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5);margin-bottom:9px")}>Áreas</div>
+              <div style={s("display:flex;flex-wrap:wrap;gap:8px")}>
+                {areas.map((dk) => (
+                  <button
+                    key={dk}
+                    onClick={() => onOpenDisc(dk)}
+                    style={s("display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border:1px solid rgba(245,243,236,0.24);border-radius:999px;background:none;color:#f5f3ec;font-family:var(--font-grotesk);font-size:12px;letter-spacing:0.02em;cursor:pointer")}
+                  >
+                    {disciplineTitle(dk, disciplines)}
+                    <ArrowRight width={18} height={9} stroke="var(--stan-acid)" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <p style={s("font-size:clamp(13px,1vw,15px);line-height:1.5;color:#f5f3ec;margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid rgba(245,243,236,0.16)")}>{caso.lead}</p>
           <p style={s("font-size:clamp(13px,1vw,15px);line-height:1.5;color:rgba(245,243,236,0.82);margin:0 0 22px")}>{caso.body}</p>
           <div style={s("font-family:var(--font-grotesk);font-weight:900;font-size:clamp(16px,1.5vw,22px);letter-spacing:0.01em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:20px")}>Lo que hicimos</div>
@@ -81,9 +131,20 @@ export function CasoOverlay({ caso, onClose }: { caso: Caso; onClose: () => void
         <span onClick={onClose} style={s("display:inline-flex;align-items:center;gap:12px;font-weight:500;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#0d0d0d;cursor:pointer")}>
           <ArrowLeft width={34} height={12} /> Volver a proyectos
         </span>
-        <span style={s("display:inline-flex;align-items:center;gap:12px;font-weight:500;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#0d0d0d")}>
-          Ver siguiente proyecto <ArrowRight width={34} height={12} />
-        </span>
+        {related ? (
+          <span
+            onClick={() => onOpenCaso?.(related.key)}
+            style={s("display:inline-flex;align-items:center;gap:14px;color:#0d0d0d;cursor:pointer")}
+          >
+            <span style={s("display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right")}>
+              <span style={s("font-weight:700;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(13,13,13,0.55)")}>
+                Siguiente proyecto{relatedArea ? ` · ${relatedArea}` : ""}
+              </span>
+              <span style={s("font-weight:500;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:#0d0d0d")}>{related.title}</span>
+            </span>
+            <ArrowRight width={34} height={12} />
+          </span>
+        ) : null}
       </div>
     </div>
   );

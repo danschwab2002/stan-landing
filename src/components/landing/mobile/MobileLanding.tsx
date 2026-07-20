@@ -3,13 +3,15 @@
 import { useRef, useState } from "react";
 import { s } from "../style";
 import { ArrowRight, ChevronDown, PlayCircle, Close } from "../icons";
-import { CASOS, DISCIPLINES, SITE } from "@/lib/landing-data";
+import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, type Caso, type Discipline } from "@/lib/landing-data";
 
 type SectionKey = "hero" | "work" | "casos" | "manifesto" | "contact";
 
-export function MobileLanding() {
+export function MobileLanding({ casos, disciplines }: { casos: Caso[]; disciplines: Discipline[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openIdx, setOpenIdx] = useState(-1);
+  const [discIdx, setDiscIdx] = useState(-1); // overlay de disciplina (navegación cruzada, G11)
+  const [reelOpen, setReelOpen] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [dragging, setDragging] = useState(false);
   const lastIdx = useRef(0);
@@ -35,7 +37,14 @@ export function MobileLanding() {
 
   const sheetOpen = openIdx >= 0;
   if (sheetOpen) lastIdx.current = openIdx;
-  const current = CASOS[sheetOpen ? openIdx : lastIdx.current];
+  const current = casos[sheetOpen ? openIdx : lastIdx.current];
+  // Caso relacionado para el "siguiente proyecto" del sheet (feedback Adriano 20/07)
+  const nextCaso = current ? relatedCaso(current, casos) : undefined;
+  const nextIdx = nextCaso ? casos.findIndex((c) => c.key === nextCaso.key) : -1;
+  const nextArea = nextCaso?.disciplines?.[0] ? disciplineTitle(nextCaso.disciplines[0], disciplines) : null;
+  // Disciplina abierta + sus casos (navegación cruzada área → casos, G11)
+  const disc = discIdx >= 0 ? disciplines[discIdx] : undefined;
+  const discCasos = disc ? casosByDiscipline(disc.key, casos) : [];
 
   return (
     <div style={s("position:relative;background:#0d0d0d;color:#f5f3ec;font-family:var(--font-grotesk);overflow-x:hidden")}>
@@ -73,10 +82,16 @@ export function MobileLanding() {
           <p style={s("font-size:17px;line-height:1.5;font-weight:400;color:rgba(245,243,236,0.94);margin:0 0 22px;max-width:330px")}>
             Las transformamos en <span style={s("text-decoration:underline;text-underline-offset:3px")}>experiencias, contenidos</span> y <span style={s("text-decoration:underline;text-underline-offset:3px")}>producciones</span> que <span style={{ fontWeight: 700 }}>generan impacto.</span>
           </p>
-          <a onClick={() => go("work")} style={s("display:inline-flex;align-items:center;gap:14px;min-height:44px;text-decoration:none;font-weight:500;font-size:16px;letter-spacing:0.12em;text-transform:uppercase;color:#f5f3ec;cursor:pointer")}>
-            Ver proyectos
-            <ArrowRight width={56} height={11} />
-          </a>
+          <div style={s("display:flex;flex-wrap:wrap;align-items:center;gap:20px")}>
+            <a onClick={() => go("casos")} style={s("display:inline-flex;align-items:center;gap:14px;min-height:44px;text-decoration:none;font-weight:500;font-size:16px;letter-spacing:0.12em;text-transform:uppercase;color:#f5f3ec;cursor:pointer")}>
+              Ver proyectos
+              <ArrowRight width={56} height={11} />
+            </a>
+            <a onClick={() => setReelOpen(true)} style={s("display:inline-flex;align-items:center;gap:10px;min-height:44px;text-decoration:none;font-weight:500;font-size:16px;letter-spacing:0.12em;text-transform:uppercase;color:#f5f3ec;cursor:pointer")}>
+              <PlayCircle width={20} height={20} stroke="var(--stan-acid)" />
+              Ver Reel 2026
+            </a>
+          </div>
           <div style={s("display:flex;align-items:center;gap:10px;margin-top:26px")}>
             <img src="/assets/logos/iso-acid.png" alt="STAN iso" style={s("display:block;width:26px;height:auto;flex:none")} />
             <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;line-height:1.7;color:rgba(245,243,236,0.66)")}>
@@ -100,23 +115,36 @@ export function MobileLanding() {
         <p style={s("font-size:17px;line-height:1.42;font-weight:700;margin:0 0 36px;color:#f5f3ec")}>{SITE.work.lead}</p>
 
         <div style={s("display:flex;flex-direction:column;gap:44px")}>
-          {DISCIPLINES.map((d) => (
-            <div key={d.key} style={s("display:flex;flex-direction:column")}>
-              <img src={d.icon} alt="" style={s("display:block;height:30px;width:auto;align-self:flex-start;margin-bottom:14px")} />
-              <h3 style={s("font-family:var(--font-grotesk);font-weight:900;font-size:26px;letter-spacing:-0.01em;line-height:1;margin:0 0 16px;color:var(--stan-acid)")}>{d.title}</h3>
-              <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:18px")} />
-              <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.84);margin:0")}>{d.desc}</p>
-              <ul style={s("list-style:none;margin:20px 0 0;padding:16px 0 0;border-top:1px solid rgba(245,243,236,0.16);display:flex;flex-direction:column;gap:11px")}>
-                {d.items.map((it) => (
-                  <li key={it} style={s("font-size:16px;color:rgba(245,243,236,0.72)")}>{it}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {disciplines.map((d, di) => {
+            // Clickeable si tiene detalle propio o casos de esa área (G11).
+            const clickable = Boolean(d.detail) || casosByDiscipline(d.key, casos).length > 0;
+            return (
+              <div
+                key={d.key}
+                onClick={clickable ? () => setDiscIdx(di) : undefined}
+                style={s(`display:flex;flex-direction:column;${clickable ? "cursor:pointer" : ""}`)}
+              >
+                <img src={d.icon} alt="" style={s("display:block;height:30px;width:auto;align-self:flex-start;margin-bottom:14px")} />
+                <h3 style={s("font-family:var(--font-grotesk);font-weight:900;font-size:26px;letter-spacing:-0.01em;line-height:1;margin:0 0 16px;color:var(--stan-acid)")}>{d.title}</h3>
+                <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:18px")} />
+                <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.84);margin:0")}>{d.desc}</p>
+                <ul style={s("list-style:none;margin:20px 0 0;padding:16px 0 0;border-top:1px solid rgba(245,243,236,0.16);display:flex;flex-direction:column;gap:11px")}>
+                  {d.items.map((it) => (
+                    <li key={it} style={s("font-size:16px;color:rgba(245,243,236,0.72)")}>{it}</li>
+                  ))}
+                </ul>
+                {clickable ? (
+                  <span style={s("display:inline-flex;align-items:center;gap:10px;min-height:44px;margin-top:12px;font-weight:700;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-acid)")}>
+                    Ver área <ArrowRight width={40} height={11} stroke="var(--stan-acid)" />
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* 02 · CASOS DESTACADOS (carrusel) */}
+      {/* 02 · casos DESTACADOS (carrusel) */}
       <section ref={casosRef} style={s("background:#0d0d0d;padding:44px 22px 40px")}>
         <div style={s("display:flex;gap:12px;align-items:baseline;margin-bottom:14px")}>
           <span style={s("font-weight:700;font-size:13px;color:var(--stan-acid)")}>{SITE.casos.n}</span>
@@ -125,7 +153,7 @@ export function MobileLanding() {
         <p style={s("font-size:17px;line-height:1.42;font-weight:700;margin:0 0 34px;color:#f5f3ec")}>{SITE.casos.lead}</p>
 
         <div className="hscroll" style={s("display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -22px;padding:0 22px 4px")}>
-          {CASOS.map((c, i) => (
+          {casos.map((c, i) => (
             <button key={c.key} onClick={() => setOpenIdx(i)} style={s("flex:none;width:78%;scroll-snap-align:start;display:block;text-align:left;padding:0;border:none;background:none;cursor:pointer")}>
               <div style={s("position:relative;border-radius:16px;overflow:hidden;background:#1a1a1a;aspect-ratio:3/4")}>
                 <div style={s("position:absolute;inset:0")}>
@@ -204,6 +232,8 @@ export function MobileLanding() {
           {[
             { label: "Email", value: SITE.contact.email, href: `mailto:${SITE.contact.email}` },
             { label: "Instagram", value: SITE.contact.instagram, href: "#" },
+            { label: "WhatsApp", value: "Escribinos", href: `https://wa.me/${SITE.contact.whatsapp}` },
+            { label: "Agendá una llamada", value: "Calendly", href: SITE.contact.calendly || "#" },
             { label: "Teléfono", value: SITE.contact.phone },
             { label: "Ubicación", value: SITE.contact.location, last: true },
           ].map((f) => (
@@ -257,6 +287,89 @@ export function MobileLanding() {
         </div>
       ) : null}
 
+      {/* REEL OVERLAY (feedback Adriano 20/07) */}
+      {reelOpen ? (
+        <div style={s("position:fixed;inset:0;z-index:60;background:rgba(6,6,6,0.96);display:flex;flex-direction:column")}>
+          <div style={s("display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 18px")}>
+            <span style={s("font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid)")}>{SITE.reel.title}</span>
+            <button onClick={() => setReelOpen(false)} aria-label="Cerrar" style={s("width:44px;height:44px;margin-right:-10px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:#f5f3ec")}>
+              <Close width={26} height={26} />
+            </button>
+          </div>
+          <div style={s("flex:1;display:flex;align-items:center;justify-content:center;padding:0 18px 40px")}>
+            <div style={s("width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#1a1a1a;position:relative")}>
+              {SITE.reel.videoUrl ? (
+                <video src={SITE.reel.videoUrl} controls autoPlay playsInline style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+              ) : (
+                <div style={s("position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:rgba(245,243,236,0.6)")}>
+                  <PlayCircle width={54} height={54} stroke="rgba(245,243,236,0.7)" strokeWidth={1.1} />
+                  <span style={s("font-size:12px;letter-spacing:0.14em;text-transform:uppercase")}>Reel próximamente</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* OVERLAY DE DISCIPLINA — navegación cruzada área → sus casos (feedback Adriano 20/07, G11) */}
+      {disc ? (
+        <div style={s("position:fixed;inset:0;z-index:58;background:#0d0d0d;color:#f5f3ec;overflow-y:auto;font-family:var(--font-grotesk)")}>
+          <div style={s("position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 18px;background:rgba(13,13,13,0.94);border-bottom:1px solid rgba(245,243,236,0.16);backdrop-filter:blur(6px)")}>
+            <span style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid)")}>Qué hacemos</span>
+            <button onClick={() => setDiscIdx(-1)} aria-label="Cerrar" style={s("width:44px;height:44px;margin-right:-10px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:#f5f3ec")}>
+              <Close width={24} height={24} />
+            </button>
+          </div>
+          <div style={s("padding:26px 22px 60px")}>
+            <img src={disc.icon} alt="" style={s("display:block;height:34px;width:auto;margin-bottom:16px")} />
+            <h2 style={s("margin:0 0 18px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:56px;line-height:0.9;text-transform:uppercase;color:var(--stan-paper)")}>{disc.title}</h2>
+            <p style={s("font-size:18px;line-height:1.5;font-weight:500;color:#f5f3ec;margin:0 0 30px")}>{disc.desc}</p>
+
+            {(disc.detail ?? []).length > 0 ? (
+              <div style={s("display:flex;flex-direction:column;gap:26px;margin-bottom:36px")}>
+                {(disc.detail ?? []).map((item, i) => (
+                  <div key={item.title} style={s("display:flex;flex-direction:column")}>
+                    <span style={s("font-weight:700;font-size:12px;color:var(--stan-acid);margin-bottom:8px")}>{`0${i + 1}.`}</span>
+                    <h3 style={s("margin:0 0 12px;font-weight:700;font-size:19px;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
+                    <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:12px")} />
+                    <p style={s("font-size:15px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {discCasos.length > 0 ? (
+              <>
+                <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:16px")}>Casos de {disc.title}</div>
+                <div style={s("display:flex;flex-direction:column;gap:14px")}>
+                  {discCasos.map((c) => {
+                    const ci = casos.findIndex((x) => x.key === c.key);
+                    return (
+                      <button
+                        key={c.key}
+                        onClick={() => { setDiscIdx(-1); setOpenIdx(ci); }}
+                        style={s("display:block;width:100%;text-align:left;padding:0;border:none;background:none;cursor:pointer")}
+                      >
+                        <div style={s("position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#1a1a1a")}>
+                          {c.cover ? (
+                            <img src={c.cover} alt={c.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
+                          ) : null}
+                          <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 44%,rgba(13,13,13,0.9) 100%)")} />
+                          <div style={s("position:absolute;left:0;right:0;bottom:0;padding:16px")}>
+                            <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:6px")}>{c.tag}</div>
+                            <h4 style={s("margin:0;font-family:var(--font-grotesk);font-weight:500;font-size:24px;line-height:1;text-transform:uppercase;color:#f5f3ec")}>{c.title}</h4>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       {/* BOTTOM SHEET DE CASO */}
       <div style={s(`position:fixed;inset:0;z-index:50;pointer-events:${sheetOpen ? "auto" : "none"}`)}>
         <div onClick={() => setOpenIdx(-1)} style={s(`position:absolute;inset:0;background:rgba(5,5,5,0.6);opacity:${sheetOpen ? 1 : 0};transition:opacity 360ms var(--ease-out)`)} />
@@ -288,7 +401,40 @@ export function MobileLanding() {
             </div>
 
             <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.6);margin-bottom:10px")}>{current?.tag}</div>
-            <h2 style={s("margin:0 0 20px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:44px;line-height:0.98")}>{current?.title}</h2>
+            <h2 style={s("margin:0 0 16px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:44px;line-height:0.98")}>{current?.title}</h2>
+            {current?.client || current?.year ? (
+              <div style={s("display:flex;flex-wrap:wrap;gap:32px;margin:0 0 18px")}>
+                {current?.client ? (
+                  <div>
+                    <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5);margin-bottom:5px")}>Cliente</div>
+                    <div style={s("font-size:16px;color:#f5f3ec")}>{current.client}</div>
+                  </div>
+                ) : null}
+                {current?.year ? (
+                  <div>
+                    <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5);margin-bottom:5px")}>Año</div>
+                    <div style={s("font-size:16px;color:#f5f3ec")}>{current.year}</div>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+            {(current?.disciplines ?? []).length > 0 ? (
+              <div style={s("margin:0 0 20px")}>
+                <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5);margin-bottom:10px")}>Áreas</div>
+                <div style={s("display:flex;flex-wrap:wrap;gap:9px")}>
+                  {(current?.disciplines ?? []).map((dk) => (
+                    <button
+                      key={dk}
+                      onClick={() => { setOpenIdx(-1); setDiscIdx(disciplines.findIndex((x) => x.key === dk)); }}
+                      style={s("display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:9px 16px;border:1px solid rgba(245,243,236,0.24);border-radius:999px;background:none;color:#f5f3ec;font-family:var(--font-grotesk);font-size:14px;cursor:pointer")}
+                    >
+                      {disciplineTitle(dk, disciplines)}
+                      <ArrowRight width={26} height={9} stroke="var(--stan-acid)" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <p style={s("font-size:18px;line-height:1.5;color:#f5f3ec;margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid rgba(245,243,236,0.16)")}>{current?.lead}</p>
             <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.82);margin:0 0 28px")}>{current?.body}</p>
 
@@ -308,6 +454,21 @@ export function MobileLanding() {
                 <div key={i} style={s("border-radius:8px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")} />
               ))}
             </div>
+
+            {nextCaso ? (
+              <button
+                onClick={() => { setOpenIdx(nextIdx); const sc = document.querySelector<HTMLElement>(".stanm"); if (sc) sc.scrollTop = 0; }}
+                style={s("width:100%;margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:#f5f3ec;color:#0d0d0d;border:none;border-radius:14px;cursor:pointer;text-align:left")}
+              >
+                <span style={s("display:flex;flex-direction:column;gap:4px")}>
+                  <span style={s("font-weight:700;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(13,13,13,0.55)")}>
+                    Siguiente proyecto{nextArea ? ` · ${nextArea}` : ""}
+                  </span>
+                  <span style={s("font-weight:500;font-size:16px;letter-spacing:0.04em;text-transform:uppercase;color:#0d0d0d")}>{nextCaso.title}</span>
+                </span>
+                <ArrowRight width={38} height={12} strokeWidth={2} />
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { saveProject } from "@/app/admin/actions";
-import type { Project } from "@/lib/db/schema";
+import type { DisciplineRow, Project } from "@/lib/db/schema";
 
 const inputCls =
   "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#16170f]";
@@ -29,7 +29,16 @@ function Family({
   );
 }
 
-export function ProjectForm({ project: p }: { project?: Project }) {
+export function ProjectForm({
+  project: p,
+  disciplines = [],
+  selectedDisciplineIds = [],
+}: {
+  project?: Project;
+  disciplines?: DisciplineRow[];
+  selectedDisciplineIds?: number[];
+}) {
+  const selected = new Set(selectedDisciplineIds);
   return (
     <form action={saveProject} className="grid gap-6">
       {p && <input type="hidden" name="id" value={p.id} />}
@@ -123,8 +132,48 @@ export function ProjectForm({ project: p }: { project?: Project }) {
         </div>
       </Family>
 
-      {/* 4 · Publicación & orden */}
-      <Family n="4" title="Publicación & orden">
+      {/* 4 · Áreas (relación M2M con "Qué hacemos") */}
+      <Family
+        n="4"
+        title="Áreas"
+        hint="Las disciplinas de “Qué hacemos” con las que se vincula el proyecto. Habilitan la navegación cruzada: el caso lista sus áreas y cada área lista sus casos."
+      >
+        {disciplines.length === 0 ? (
+          <p className="text-sm text-black/45">
+            No hay áreas cargadas todavía.{" "}
+            <Link href="/admin/disciplinas/nuevo" className="font-semibold underline">
+              Creá la primera
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {disciplines.map((d) => (
+              <label
+                key={d.id}
+                className="flex items-center gap-2.5 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium"
+              >
+                <input
+                  type="checkbox"
+                  name="disciplineIds"
+                  value={d.id}
+                  defaultChecked={selected.has(d.id)}
+                  className="h-4 w-4 accent-[#16170f]"
+                />
+                {d.title}
+                {!d.published && (
+                  <span className="ml-auto text-[10px] uppercase tracking-wider text-black/35">
+                    borrador
+                  </span>
+                )}
+              </label>
+            ))}
+          </div>
+        )}
+      </Family>
+
+      {/* 5 · Publicación & orden */}
+      <Family n="5" title="Publicación & orden">
         <div className="flex flex-wrap items-center gap-6">
           <label className="flex items-center gap-2 text-sm font-medium">
             <input

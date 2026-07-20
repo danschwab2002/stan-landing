@@ -1,5 +1,5 @@
 import { s } from "../style";
-import { ArrowRight, ChevronDown } from "../icons";
+import { ArrowRight, ChevronDown, PlayCircle } from "../icons";
 import { SITE } from "@/lib/landing-data";
 
 export function Hero() {
@@ -54,10 +54,16 @@ export function Hero() {
               <span style={s("text-decoration:underline;text-underline-offset:3px")}>producciones</span> que{" "}
               <span style={{ fontWeight: 700 }}>generan impacto.</span>
             </p>
-            <a className="stan-textlink" href="#work" style={s("font-size:clamp(12px,1.1vw,15px)")}>
-              Ver proyectos
-              <ArrowRight width={52} height={10} />
-            </a>
+            <div style={s("display:flex;flex-wrap:wrap;align-items:center;gap:clamp(16px,1.6vw,26px)")}>
+              <a className="stan-textlink" href="#casos" style={s("font-size:clamp(12px,1.1vw,15px)")}>
+                Ver proyectos
+                <ArrowRight width={52} height={10} />
+              </a>
+              <a className="stan-textlink" href="#reel" style={s("font-size:clamp(12px,1.1vw,15px)")}>
+                <PlayCircle width={17} height={17} stroke="var(--stan-acid)" />
+                Ver Reel 2026
+              </a>
+            </div>
           </div>
         </div>
         <div style={s("display:flex;align-items:center;gap:10px;margin-top:clamp(18px,2.2vw,30px)")}>

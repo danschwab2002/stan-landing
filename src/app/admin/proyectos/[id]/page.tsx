@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProject } from "@/lib/data/projects";
+import { getProject, getProjectDisciplineIds } from "@/lib/data/projects";
+import { getAllDisciplines } from "@/lib/data/disciplines";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 
 export default async function EditarProyecto({
@@ -9,8 +10,14 @@ export default async function EditarProyecto({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const project = await getProject(Number(id));
+  const projectId = Number(id);
+  const project = await getProject(projectId);
   if (!project) notFound();
+
+  const [disciplines, selectedDisciplineIds] = await Promise.all([
+    getAllDisciplines(),
+    getProjectDisciplineIds(projectId),
+  ]);
 
   return (
     <div className="max-w-2xl">
@@ -23,7 +30,11 @@ export default async function EditarProyecto({
       <h1 className="mb-6 mt-2 font-display text-3xl font-black tracking-tight">
         Editar: {project.title}
       </h1>
-      <ProjectForm project={project} />
+      <ProjectForm
+        project={project}
+        disciplines={disciplines}
+        selectedDisciplineIds={selectedDisciplineIds}
+      />
     </div>
   );
 }

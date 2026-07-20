@@ -1,9 +1,9 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, primaryKey } from "drizzle-orm/sqlite-core";
 
 /**
  * Colección "Proyectos" (Portfolio) — el molde uniforme del CMS.
  * Familias: 1) Identidad & contenido · 2) Media · 3) Navegación · 4) Publicación & orden.
- * (La relación M2M con Servicios se suma en una iteración posterior.)
+ * La relación con Disciplinas es M2M vía `projectDisciplines` (abajo).
  */
 export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -12,10 +12,10 @@ export const projects = sqliteTable("projects", {
   title: text("title").notNull(),
   client: text("client").default(""),
   year: integer("year"),
-  category: text("category").default(""),
+  category: text("category").default(""), // etiqueta corta de la tarjeta (tag)
   location: text("location").default(""),
-  shortDesc: text("short_desc").default(""), // descripción de la tarjeta
-  longDesc: text("long_desc").default(""), // descripción del detalle
+  shortDesc: text("short_desc").default(""), // descripción de la tarjeta / lead
+  longDesc: text("long_desc").default(""), // descripción del detalle / body
   credits: text("credits").default(""),
 
   // 2 · Media
@@ -34,5 +34,43 @@ export const projects = sqliteTable("projects", {
   updatedAt: text("updated_at"),
 });
 
+/**
+ * Colección "Disciplinas" (áreas de "Qué hacemos") — la 2da colección editable.
+ * `items` y `detail` se guardan como JSON serializado (texto): la capa de datos
+ * los parsea. `detail` es un array de { title, desc }; puede estar vacío.
+ */
+export const disciplines = sqliteTable("disciplines", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  key: text("key").notNull().unique(), // slug estable (content, streaming, …)
+  title: text("title").notNull(),
+  icon: text("icon").default(""),
+  description: text("description").default(""), // `desc` es palabra reservada en SQL
+  items: text("items").default("[]"), // JSON: string[]
+  detail: text("detail").default("[]"), // JSON: { title, desc }[]
+  published: integer("published", { mode: "boolean" }).default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: text("created_at"),
+  updatedAt: text("updated_at"),
+});
+
+/**
+ * Relación muchos-a-muchos Proyectos ↔ Disciplinas (G11): un caso toca varias
+ * áreas y un área agrupa varios casos. PK compuesta (projectId, disciplineId).
+ */
+export const projectDisciplines = sqliteTable(
+  "project_disciplines",
+  {
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    disciplineId: integer("discipline_id")
+      .notNull()
+      .references(() => disciplines.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.projectId, t.disciplineId] })]
+);
+
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
+export type DisciplineRow = typeof disciplines.$inferSelect;
+export type NewDisciplineRow = typeof disciplines.$inferInsert;

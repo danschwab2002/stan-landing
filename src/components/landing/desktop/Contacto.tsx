@@ -38,6 +38,14 @@ export function Contacto() {
                   <a href="#" style={s(FIELD_VALUE)}>{c.instagram}</a>
                 </div>
                 <div style={s(FIELD_BOX)}>
+                  <div style={s(FIELD_LABEL)}>WhatsApp</div>
+                  <a href={`https://wa.me/${c.whatsapp}`} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>Escribinos</a>
+                </div>
+                <div style={s(FIELD_BOX)}>
+                  <div style={s(FIELD_LABEL)}>Agendá una llamada</div>
+                  <a href={c.calendly || "#"} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>Calendly</a>
+                </div>
+                <div style={s(FIELD_BOX)}>
                   <div style={s(FIELD_LABEL)}>Teléfono</div>
                   <span style={s(FIELD_VALUE)}>{c.phone}</span>
                 </div>

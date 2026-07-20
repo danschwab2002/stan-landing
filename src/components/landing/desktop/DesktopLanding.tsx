@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CASOS, DISCIPLINES } from "@/lib/landing-data";
+import { relatedCaso, type Caso, type Discipline } from "@/lib/landing-data";
 import { Hero } from "./Hero";
 import { QueHacemos } from "./QueHacemos";
 import { Marquee } from "./Marquee";
@@ -10,8 +10,9 @@ import { Manifesto } from "./Manifesto";
 import { Contacto } from "./Contacto";
 import { CasoOverlay } from "./CasoOverlay";
 import { DisciplinaOverlay } from "./DisciplinaOverlay";
+import { ReelOverlay } from "./ReelOverlay";
 
-export function DesktopLanding() {
+export function DesktopLanding({ casos, disciplines }: { casos: Caso[]; disciplines: Discipline[] }) {
   const [hash, setHash] = useState("");
 
   useEffect(() => {
@@ -24,8 +25,9 @@ export function DesktopLanding() {
   const slug = hash.replace(/^#\/?/, "");
   const casoKey = slug.startsWith("caso/") ? slug.slice(5) : null;
   const discKey = slug.startsWith("disciplina/") ? slug.slice(11) : null;
-  const activeCaso = casoKey ? CASOS.find((c) => c.key === casoKey) : undefined;
-  const activeDisc = discKey ? DISCIPLINES.find((d) => d.key === discKey) : undefined;
+  const reelOpen = slug === "reel";
+  const activeCaso = casoKey ? casos.find((c) => c.key === casoKey) : undefined;
+  const activeDisc = discKey ? disciplines.find((d) => d.key === discKey) : undefined;
 
   const openCaso = (key: string) => {
     location.hash = "caso/" + key;
@@ -39,19 +41,25 @@ export function DesktopLanding() {
   const closeDisc = () => {
     location.hash = "work";
   };
+  const closeReel = () => {
+    location.hash = "hero";
+  };
 
   return (
     <div style={{ fontFamily: "var(--font-grotesk)" }}>
       <Hero />
-      <QueHacemos onOpen={openDisc} />
+      <QueHacemos disciplines={disciplines} casos={casos} onOpen={openDisc} />
       <Marquee />
-      <Casos onOpen={openCaso} />
+      <Casos casos={casos} onOpen={openCaso} />
       <Manifesto />
       <Marquee />
       <Contacto />
 
-      {activeCaso ? <CasoOverlay caso={activeCaso} onClose={closeCaso} /> : null}
-      {activeDisc ? <DisciplinaOverlay discipline={activeDisc} onClose={closeDisc} /> : null}
+      {activeCaso ? (
+        <CasoOverlay caso={activeCaso} related={relatedCaso(activeCaso, casos)} disciplines={disciplines} onOpenCaso={openCaso} onOpenDisc={openDisc} onClose={closeCaso} />
+      ) : null}
+      {activeDisc ? <DisciplinaOverlay discipline={activeDisc} casos={casos} onOpenCaso={openCaso} onClose={closeDisc} /> : null}
+      {reelOpen ? <ReelOverlay onClose={closeReel} /> : null}
     </div>
   );
 }

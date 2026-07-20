@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import * as schema from "./schema";
+import { CASOS, DISCIPLINES } from "@/lib/landing-data";
 
 const url = process.env.DATABASE_URL ?? "file:stan.db";
 const client = createClient({ url });
@@ -8,9 +9,12 @@ const client = createClient({ url });
 export const db = drizzle(client, { schema });
 
 /**
- * Init perezoso: crea la tabla si no existe y siembra contenido de ejemplo
+ * Init perezoso: crea las tablas si no existen y siembra contenido de ejemplo
  * la primera vez. Memoizado para correr una sola vez por proceso.
- * (En producción esto lo reemplazan las migraciones de Drizzle sobre Postgres/Supabase.)
+ *
+ * El seed sale de `landing-data.ts` (CASOS + DISCIPLINES) — la MISMA fuente que
+ * usaba el frontend estático — para que la landing recableada se vea idéntica.
+ * En producción, esto lo reemplazan las migraciones de Drizzle.
  */
 let ready: Promise<void> | null = null;
 export function ensureDb(): Promise<void> {
@@ -41,95 +45,110 @@ async function init() {
     )
   `);
 
-  const res = await client.execute(`SELECT COUNT(*) AS c FROM projects`);
-  const count = Number(res.rows[0]?.c ?? 0);
-  if (count === 0) await seed();
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS disciplines (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key TEXT NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      icon TEXT DEFAULT '',
+      description TEXT DEFAULT '',
+      items TEXT DEFAULT '[]',
+      detail TEXT DEFAULT '[]',
+      published INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0,
+      created_at TEXT,
+      updated_at TEXT
+    )
+  `);
+
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS project_disciplines (
+      project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      discipline_id INTEGER NOT NULL REFERENCES disciplines(id) ON DELETE CASCADE,
+      PRIMARY KEY (project_id, discipline_id)
+    )
+  `);
+
+  const dCount = Number(
+    (await client.execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
+  );
+  if (dCount === 0) await seedDisciplines();
+
+  const pCount = Number(
+    (await client.execute(`SELECT COUNT(*) AS c FROM projects`)).rows[0]?.c ?? 0
+  );
+  if (pCount === 0) await seedProjects();
 }
 
-async function seed() {
+/** Siembra las 5 disciplinas desde DISCIPLINES (landing-data). */
+async function seedDisciplines() {
   const now = new Date().toISOString();
-  const rows = [
-    {
-      title: "Le Coq Sportif",
-      client: "Le Coq Sportif",
-      year: 2024,
-      category: "Content",
-      location: "Buenos Aires",
-      short_desc: "Campaña de marca con sistema de contenido de alto impacto.",
-      long_desc:
-        "Desarrollamos un sistema de contenido para el lanzamiento de temporada, pensado para generar impacto y consistencia en todas las plataformas.",
-      credits: "Dirección: STAN · Producción: STAN",
-      cover_url: "/seed/lecoq.jpg",
-      video_url: "https://vimeo.com/76979871",
-      slug: "le-coq-sportif",
-      published: 1,
-      featured: 1,
-      sort_order: 1,
-    },
-    {
-      title: "Chandon",
-      client: "Chandon",
-      year: 2024,
-      category: "Experiences",
-      location: "Buenos Aires",
-      short_desc: "Experiencia inmersiva para un lanzamiento de marca.",
-      long_desc:
-        "Convertimos un espacio físico en una experiencia memorable: escenografía, luz y producción integral para una noche de marca.",
-      credits: "Dirección creativa: STAN",
-      cover_url: "/seed/chandon.jpg",
-      video_url: "https://vimeo.com/76979871",
-      slug: "chandon",
-      published: 1,
-      featured: 1,
-      sort_order: 2,
-    },
-    {
-      title: "Cocos Capital",
-      client: "Cocos Capital",
-      year: 2023,
-      category: "Streaming",
-      location: "Buenos Aires",
-      short_desc: "Programa en vivo y cobertura de eventos financieros.",
-      long_desc:
-        "Diseñamos experiencias en vivo para conectar con la audiencia en tiempo real: estudio, dirección y distribución multiplataforma.",
-      credits: "Producción: STAN",
-      cover_url: "/seed/cocos.jpg",
-      video_url: "https://vimeo.com/76979871",
-      slug: "cocos-capital",
-      published: 1,
-      featured: 1,
-      sort_order: 3,
-    },
-    {
-      title: "Faro",
-      client: "Faro",
-      year: 2023,
-      category: "Production",
-      location: "Buenos Aires",
-      short_desc: "Desde la idea hasta la entrega final.",
-      long_desc:
-        "Producción integral de la pieza: filmación, postproducción y dirección creativa de punta a punta.",
-      credits: "Dirección: STAN",
-      cover_url: "/seed/faro.jpg",
-      video_url: "https://vimeo.com/76979871",
-      slug: "faro",
-      published: 1,
-      featured: 0,
-      sort_order: 4,
-    },
-  ];
-
-  for (const r of rows) {
+  for (let i = 0; i < DISCIPLINES.length; i++) {
+    const d = DISCIPLINES[i];
     await client.execute({
+      sql: `INSERT INTO disciplines
+        (key, title, icon, description, items, detail, published, sort_order, created_at, updated_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      args: [
+        d.key,
+        d.title,
+        d.icon,
+        d.desc,
+        JSON.stringify(d.items ?? []),
+        JSON.stringify(d.detail ?? []),
+        1,
+        i,
+        now,
+        now,
+      ],
+    });
+  }
+}
+
+/** Siembra los proyectos desde CASOS (landing-data) + su relación M2M con disciplinas. */
+async function seedProjects() {
+  const now = new Date().toISOString();
+
+  // Mapa key→id de las disciplinas ya sembradas.
+  const drows = await client.execute(`SELECT id, key FROM disciplines`);
+  const discIdByKey = new Map<string, number>();
+  for (const r of drows.rows) discIdByKey.set(String(r.key), Number(r.id));
+
+  for (let i = 0; i < CASOS.length; i++) {
+    const c = CASOS[i];
+    const ins = await client.execute({
       sql: `INSERT INTO projects
         (title, client, year, category, location, short_desc, long_desc, credits,
          cover_url, video_url, slug, published, featured, sort_order, created_at, updated_at)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       args: [
-        r.title, r.client, r.year, r.category, r.location, r.short_desc,
-        r.long_desc, r.credits, r.cover_url, r.video_url, r.slug,
-        r.published, r.featured, r.sort_order, now, now,
+        c.titleLines.join(" "), // título en caso normal; la vista lo pasa a mayúsculas
+        c.client ?? "",
+        c.year ?? null,
+        c.tag, // etiqueta corta de la tarjeta
+        "",
+        c.lead,
+        c.body,
+        "",
+        c.cover ?? "",
+        "",
+        c.key,
+        1,
+        1,
+        i + 1,
+        now,
+        now,
       ],
     });
+    const projectId = Number(ins.lastInsertRowid);
+
+    for (const dk of c.disciplines ?? []) {
+      const did = discIdByKey.get(dk);
+      if (!did) continue;
+      await client.execute({
+        sql: `INSERT OR IGNORE INTO project_disciplines (project_id, discipline_id) VALUES (?,?)`,
+        args: [projectId, did],
+      });
+    }
   }
 }
