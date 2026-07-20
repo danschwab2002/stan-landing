@@ -4,6 +4,9 @@ import { getProject, getProjectDisciplineIds } from "@/lib/data/projects";
 import { getAllDisciplines } from "@/lib/data/disciplines";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 
+// Lee la DB (runtime-only): no prerenderizar en build, donde /data aún no existe.
+export const dynamic = "force-dynamic";
+
 export default async function EditarProyecto({
   params,
 }: {

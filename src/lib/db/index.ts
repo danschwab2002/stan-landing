@@ -1,12 +1,48 @@
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
+import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
+import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
 import { CASOS, DISCIPLINES } from "@/lib/landing-data";
 
-const url = process.env.DATABASE_URL ?? "file:stan.db";
-const client = createClient({ url });
+/**
+ * Cliente + drizzle PEREZOSOS: no abrir la conexión al importar el módulo.
+ *
+ * El cliente libsql abre el archivo de forma *eager* dentro de `createClient()`.
+ * Si eso corre en build (Next importa el módulo de cada página para leer su
+ * config, arrastrando `lib/db`), y `DATABASE_URL` apunta a `/data/stan.db` —el
+ * volumen que recién se monta en runtime— el build revienta con SQLITE_CANTOPEN.
+ * Difiriendo la creación al primer uso, importar `db` nunca toca la DB en build;
+ * solo se conecta en runtime, cuando se ejecuta una query de verdad.
+ */
+let _client: Client | null = null;
+function getClient(): Client {
+  if (!_client) {
+    const url = process.env.DATABASE_URL ?? "file:stan.db";
+    _client = createClient({ url });
+  }
+  return _client;
+}
 
-export const db = drizzle(client, { schema });
+type DB = LibSQLDatabase<typeof schema>;
+let _db: DB | null = null;
+function getDb(): DB {
+  if (!_db) _db = drizzle(getClient(), { schema });
+  return _db;
+}
+
+/**
+ * Fachada perezosa: conserva la interfaz `db.select()…` de siempre, pero sin que
+ * importar el módulo cree la conexión. Los consumidores solo tocan `db` dentro
+ * de funciones async (runtime), así que el proxy nunca se dispara en el import.
+ */
+export const db = new Proxy({} as DB, {
+  get(_target, prop) {
+    const real = getDb() as unknown as Record<PropertyKey, unknown>;
+    const value = real[prop];
+    return typeof value === "function"
+      ? (value as (...args: unknown[]) => unknown).bind(real)
+      : value;
+  },
+});
 
 /**
  * Init perezoso: crea las tablas si no existen y siembra contenido de ejemplo
@@ -23,7 +59,7 @@ export function ensureDb(): Promise<void> {
 }
 
 async function init() {
-  await client.execute(`
+  await getClient().execute(`
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
@@ -45,7 +81,7 @@ async function init() {
     )
   `);
 
-  await client.execute(`
+  await getClient().execute(`
     CREATE TABLE IF NOT EXISTS disciplines (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       key TEXT NOT NULL UNIQUE,
@@ -61,7 +97,7 @@ async function init() {
     )
   `);
 
-  await client.execute(`
+  await getClient().execute(`
     CREATE TABLE IF NOT EXISTS project_disciplines (
       project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
       discipline_id INTEGER NOT NULL REFERENCES disciplines(id) ON DELETE CASCADE,
@@ -70,12 +106,12 @@ async function init() {
   `);
 
   const dCount = Number(
-    (await client.execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
+    (await getClient().execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
   );
   if (dCount === 0) await seedDisciplines();
 
   const pCount = Number(
-    (await client.execute(`SELECT COUNT(*) AS c FROM projects`)).rows[0]?.c ?? 0
+    (await getClient().execute(`SELECT COUNT(*) AS c FROM projects`)).rows[0]?.c ?? 0
   );
   if (pCount === 0) await seedProjects();
 }
@@ -85,7 +121,7 @@ async function seedDisciplines() {
   const now = new Date().toISOString();
   for (let i = 0; i < DISCIPLINES.length; i++) {
     const d = DISCIPLINES[i];
-    await client.execute({
+    await getClient().execute({
       sql: `INSERT INTO disciplines
         (key, title, icon, description, items, detail, published, sort_order, created_at, updated_at)
         VALUES (?,?,?,?,?,?,?,?,?,?)`,
@@ -110,13 +146,13 @@ async function seedProjects() {
   const now = new Date().toISOString();
 
   // Mapa key→id de las disciplinas ya sembradas.
-  const drows = await client.execute(`SELECT id, key FROM disciplines`);
+  const drows = await getClient().execute(`SELECT id, key FROM disciplines`);
   const discIdByKey = new Map<string, number>();
   for (const r of drows.rows) discIdByKey.set(String(r.key), Number(r.id));
 
   for (let i = 0; i < CASOS.length; i++) {
     const c = CASOS[i];
-    const ins = await client.execute({
+    const ins = await getClient().execute({
       sql: `INSERT INTO projects
         (title, client, year, category, location, short_desc, long_desc, credits,
          cover_url, video_url, slug, published, featured, sort_order, created_at, updated_at)
@@ -145,7 +181,7 @@ async function seedProjects() {
     for (const dk of c.disciplines ?? []) {
       const did = discIdByKey.get(dk);
       if (!did) continue;
-      await client.execute({
+      await getClient().execute({
         sql: `INSERT OR IGNORE INTO project_disciplines (project_id, discipline_id) VALUES (?,?)`,
         args: [projectId, did],
       });

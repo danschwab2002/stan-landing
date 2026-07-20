@@ -4,6 +4,9 @@ import { removeDiscipline, setDisciplinePublished } from "@/app/admin/actions";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import type { DisciplineRow } from "@/lib/db/schema";
 
+// Lee la DB (runtime-only): no prerenderizar en build, donde /data aún no existe.
+export const dynamic = "force-dynamic";
+
 function PublishedToggle({ d }: { d: DisciplineRow }) {
   const on = Boolean(d.published);
   return (

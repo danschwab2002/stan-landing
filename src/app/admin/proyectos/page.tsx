@@ -4,6 +4,9 @@ import { setFlag } from "@/app/admin/actions";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import type { Project } from "@/lib/db/schema";
 
+// Lee la DB (runtime-only): no prerenderizar en build, donde /data aún no existe.
+export const dynamic = "force-dynamic";
+
 function FlagToggle({
   project,
   field,

@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { DisciplineForm } from "@/components/admin/DisciplineForm";
 
+// Importa la cadena de acceso a la DB (el cliente libsql abre eager): no
+// prerenderizar en build, donde /data aún no existe. Panel dinámico.
+export const dynamic = "force-dynamic";
+
 export default function NuevaDisciplina() {
   return (
     <div className="max-w-2xl">

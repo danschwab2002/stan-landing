@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 import { getAllDisciplines } from "@/lib/data/disciplines";
 
+// Lee la DB (runtime-only): no prerenderizar en build, donde /data aún no existe.
+export const dynamic = "force-dynamic";
+
 export default async function NuevoProyecto() {
   const disciplines = await getAllDisciplines();
   return (

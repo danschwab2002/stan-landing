@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { getDisciplineRow } from "@/lib/data/disciplines";
 import { DisciplineForm } from "@/components/admin/DisciplineForm";
 
+// Lee la DB (runtime-only): no prerenderizar en build, donde /data aún no existe.
+export const dynamic = "force-dynamic";
+
 export default async function EditarDisciplina({
   params,
 }: {
