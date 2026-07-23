@@ -29,6 +29,9 @@ export type Caso = {
   body: string;
   /** "Lo que hicimos" */
   services: ServiceTag[];
+  /** Keys de los casos recomendados al pie ("Otros proyectos", rabbit-hole).
+   *  Manual desde el CMS o, si no hay asignados, un set al azar (Adriano 22/07). */
+  recommended?: string[];
 };
 
 export type DisciplineDetailItem = { title: string; desc: string };

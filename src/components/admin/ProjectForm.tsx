@@ -33,12 +33,18 @@ export function ProjectForm({
   project: p,
   disciplines = [],
   selectedDisciplineIds = [],
+  allProjects = [],
+  selectedRecommendedIds = [],
 }: {
   project?: Project;
   disciplines?: DisciplineRow[];
   selectedDisciplineIds?: number[];
+  allProjects?: Project[];
+  selectedRecommendedIds?: number[];
 }) {
   const selected = new Set(selectedDisciplineIds);
+  const selectedRecs = new Set(selectedRecommendedIds);
+  const otherProjects = allProjects.filter((op) => op.id !== p?.id);
   return (
     <form action={saveProject} className="grid gap-6">
       {p && <input type="hidden" name="id" value={p.id} />}
@@ -129,6 +135,39 @@ export function ProjectForm({
         <div>
           <label className={labelCls}>Slug</label>
           <input name="slug" defaultValue={p?.slug ?? ""} className={inputCls} placeholder="le-coq-sportif" />
+        </div>
+        <div>
+          <label className={labelCls}>Casos recomendados (al pie del caso)</label>
+          <p className="mb-2 text-xs text-black/45">
+            Los otros casos que se sugieren al final de este, para seguir recorriendo
+            (“Otros casos destacados”). <strong>Si no elegís ninguno, se muestran al azar.</strong>
+          </p>
+          {otherProjects.length === 0 ? (
+            <p className="text-sm text-black/45">No hay otros proyectos todavía.</p>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {otherProjects.map((op) => (
+                <label
+                  key={op.id}
+                  className="flex items-center gap-2.5 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium"
+                >
+                  <input
+                    type="checkbox"
+                    name="recommendedIds"
+                    value={op.id}
+                    defaultChecked={selectedRecs.has(op.id)}
+                    className="h-4 w-4 accent-[#16170f]"
+                  />
+                  {op.title}
+                  {!(op.published && op.featured) && (
+                    <span className="ml-auto text-[10px] uppercase tracking-wider text-black/35">
+                      no visible
+                    </span>
+                  )}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       </Family>
 

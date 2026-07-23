@@ -7,6 +7,7 @@ import {
   deleteProject,
   getProject,
   setProjectDisciplines,
+  setProjectRecommendations,
   updateProject,
 } from "@/lib/data/projects";
 import {
@@ -95,6 +96,8 @@ export async function saveProject(formData: FormData) {
 
   // Áreas (relación M2M): reemplaza el set con lo tildado en el form.
   await setProjectDisciplines(projectId, ids(formData, "disciplineIds"));
+  // Casos recomendados (rabbit-hole): lo tildado; vacío = random en la landing.
+  await setProjectRecommendations(projectId, ids(formData, "recommendedIds"));
 
   revalidateAll();
   redirect("/admin/proyectos");

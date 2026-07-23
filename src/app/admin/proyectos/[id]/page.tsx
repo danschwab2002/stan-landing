@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProject, getProjectDisciplineIds } from "@/lib/data/projects";
+import {
+  getAllProjects,
+  getProject,
+  getProjectDisciplineIds,
+  getProjectRecommendationIds,
+} from "@/lib/data/projects";
 import { getAllDisciplines } from "@/lib/data/disciplines";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 
@@ -17,10 +22,13 @@ export default async function EditarProyecto({
   const project = await getProject(projectId);
   if (!project) notFound();
 
-  const [disciplines, selectedDisciplineIds] = await Promise.all([
-    getAllDisciplines(),
-    getProjectDisciplineIds(projectId),
-  ]);
+  const [disciplines, selectedDisciplineIds, allProjects, selectedRecommendedIds] =
+    await Promise.all([
+      getAllDisciplines(),
+      getProjectDisciplineIds(projectId),
+      getAllProjects(),
+      getProjectRecommendationIds(projectId),
+    ]);
 
   return (
     <div className="max-w-2xl">
@@ -37,6 +45,8 @@ export default async function EditarProyecto({
         project={project}
         disciplines={disciplines}
         selectedDisciplineIds={selectedDisciplineIds}
+        allProjects={allProjects}
+        selectedRecommendedIds={selectedRecommendedIds}
       />
     </div>
   );

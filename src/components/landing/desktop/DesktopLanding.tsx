@@ -29,6 +29,14 @@ export function DesktopLanding({ casos, disciplines }: { casos: Caso[]; discipli
   const activeCaso = casoKey ? casos.find((c) => c.key === casoKey) : undefined;
   const activeDisc = discKey ? disciplines.find((d) => d.key === discKey) : undefined;
 
+  // Casos recomendados al pie (rabbit-hole): resueltos server-side (manual o random),
+  // acá solo mapeamos las keys a sus Casos, en orden.
+  const recommendedCasos: Caso[] = activeCaso
+    ? (activeCaso.recommended ?? [])
+        .map((k) => casos.find((c) => c.key === k))
+        .filter((c): c is Caso => Boolean(c))
+    : [];
+
   const openCaso = (key: string) => {
     location.hash = "caso/" + key;
   };
@@ -56,7 +64,7 @@ export function DesktopLanding({ casos, disciplines }: { casos: Caso[]; discipli
       <Contacto />
 
       {activeCaso ? (
-        <CasoOverlay caso={activeCaso} related={relatedCaso(activeCaso, casos)} disciplines={disciplines} onOpenCaso={openCaso} onOpenDisc={openDisc} onClose={closeCaso} />
+        <CasoOverlay caso={activeCaso} related={relatedCaso(activeCaso, casos)} recommended={recommendedCasos} disciplines={disciplines} onOpenCaso={openCaso} onOpenDisc={openDisc} onClose={closeCaso} />
       ) : null}
       {activeDisc ? <DisciplinaOverlay discipline={activeDisc} casos={casos} onOpenCaso={openCaso} onClose={closeDisc} /> : null}
       {reelOpen ? <ReelOverlay onClose={closeReel} /> : null}

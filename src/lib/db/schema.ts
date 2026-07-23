@@ -70,6 +70,26 @@ export const projectDisciplines = sqliteTable(
   (t) => [primaryKey({ columns: [t.projectId, t.disciplineId] })]
 );
 
+/**
+ * Recomendación de casos (rabbit-hole, decisión Adriano 22/07): al pie de un caso
+ * destacado se muestran "otros proyectos". Auto-relación DIRIGIDA sobre projects —
+ * (projectId) recomienda a (recommendedId), con `sortOrder` para el orden manual.
+ * Si un proyecto no tiene filas acá, la capa de datos cae a random (manual + fallback).
+ */
+export const projectRecommendations = sqliteTable(
+  "project_recommendations",
+  {
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    recommendedId: integer("recommended_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    sortOrder: integer("sort_order").default(0),
+  },
+  (t) => [primaryKey({ columns: [t.projectId, t.recommendedId] })]
+);
+
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type DisciplineRow = typeof disciplines.$inferSelect;

@@ -105,6 +105,15 @@ async function init() {
     )
   `);
 
+  await getClient().execute(`
+    CREATE TABLE IF NOT EXISTS project_recommendations (
+      project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      recommended_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      sort_order INTEGER DEFAULT 0,
+      PRIMARY KEY (project_id, recommended_id)
+    )
+  `);
+
   const dCount = Number(
     (await getClient().execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
   );

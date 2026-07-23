@@ -22,6 +22,7 @@ function OverlayNav() {
 export function CasoOverlay({
   caso,
   related,
+  recommended = [],
   disciplines,
   onOpenCaso,
   onOpenDisc,
@@ -29,6 +30,7 @@ export function CasoOverlay({
 }: {
   caso: Caso;
   related?: Caso;
+  recommended?: Caso[];
   disciplines: Discipline[];
   onOpenCaso?: (key: string) => void;
   onOpenDisc?: (key: string) => void;
@@ -125,6 +127,44 @@ export function CasoOverlay({
           ))}
         </div>
       </div>
+
+      {/* Otros casos destacados (rabbit-hole, ref Cacodelphia · decisión Adriano 22/07):
+          manual desde el CMS o random. Grilla de cuadros portada + título → abre el caso. */}
+      {recommended.length > 0 ? (
+        <div style={s("padding:clamp(10px,1.4vw,22px) clamp(24px,5vw,64px) clamp(30px,4vw,60px)")}>
+          <div style={s("display:flex;align-items:center;gap:16px;margin-bottom:clamp(22px,3vw,40px)")}>
+            <div style={s("flex:1;height:1px;background:rgba(245,243,236,0.2)")} />
+            <div style={s("width:9px;height:9px;border-radius:999px;border:1px solid var(--stan-acid)")} />
+            <div style={s("flex:1;height:1px;background:rgba(245,243,236,0.2)")} />
+          </div>
+          <h3 style={s("text-align:center;font-family:var(--font-grotesk);font-weight:900;font-size:clamp(15px,1.5vw,21px);letter-spacing:0.02em;text-transform:uppercase;color:var(--stan-acid);margin:0 0 clamp(20px,2.6vw,36px)")}>
+            Otros casos destacados
+          </h3>
+          <div style={s("display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(12px,1.6vw,24px)")}>
+            {recommended.map((rc) => {
+              const rcArea = rc.disciplines?.[0] ? disciplineTitle(rc.disciplines[0], disciplines) : null;
+              return (
+                <button
+                  key={rc.key}
+                  onClick={() => onOpenCaso?.(rc.key)}
+                  style={s("position:relative;display:block;padding:0;border:none;background:#1a1a1a;overflow:hidden;aspect-ratio:16/9;cursor:pointer;text-align:left")}
+                >
+                  {rc.cover ? (
+                    <img src={rc.cover} alt={rc.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
+                  ) : null}
+                  <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 42%,rgba(13,13,13,0.9) 100%)")} />
+                  <div style={s("position:absolute;left:0;right:0;bottom:0;padding:clamp(14px,1.6vw,24px)")}>
+                    <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:6px")}>
+                      {rc.tag}{rcArea && rcArea !== rc.tag ? ` · ${rcArea}` : ""}
+                    </div>
+                    <h4 style={s("margin:0;font-family:var(--font-grotesk);font-weight:500;font-size:clamp(18px,2vw,30px);line-height:1;text-transform:uppercase;color:#f5f3ec")}>{rc.title}</h4>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       {/* Barra inferior */}
       <div style={s("background:#f5f3ec;color:#0d0d0d;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:clamp(16px,1.8vw,26px) clamp(24px,5vw,64px)")}>

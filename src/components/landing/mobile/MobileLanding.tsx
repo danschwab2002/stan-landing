@@ -42,6 +42,12 @@ export function MobileLanding({ casos, disciplines }: { casos: Caso[]; disciplin
   const nextCaso = current ? relatedCaso(current, casos) : undefined;
   const nextIdx = nextCaso ? casos.findIndex((c) => c.key === nextCaso.key) : -1;
   const nextArea = nextCaso?.disciplines?.[0] ? disciplineTitle(nextCaso.disciplines[0], disciplines) : null;
+  // Casos recomendados al pie (rabbit-hole: manual o random, decisión Adriano 22/07)
+  const recCasos: Caso[] = current
+    ? (current.recommended ?? [])
+        .map((k) => casos.find((c) => c.key === k))
+        .filter((c): c is Caso => Boolean(c))
+    : [];
   // Disciplina abierta + sus casos (navegación cruzada área → casos, G11)
   const disc = discIdx >= 0 ? disciplines[discIdx] : undefined;
   const discCasos = disc ? casosByDiscipline(disc.key, casos) : [];
@@ -454,6 +460,41 @@ export function MobileLanding({ casos, disciplines }: { casos: Caso[]; disciplin
                 <div key={i} style={s("border-radius:8px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")} />
               ))}
             </div>
+
+            {/* Otros casos destacados (rabbit-hole: manual o random, Adriano 22/07) */}
+            {recCasos.length > 0 ? (
+              <>
+                <div style={s("display:flex;align-items:center;gap:14px;margin:30px 0 18px")}>
+                  <div style={s("flex:1;height:1px;background:rgba(245,243,236,0.2)")} />
+                  <div style={s("width:8px;height:8px;border-radius:999px;border:1px solid var(--stan-acid)")} />
+                  <div style={s("flex:1;height:1px;background:rgba(245,243,236,0.2)")} />
+                </div>
+                <div style={s("text-align:center;font-family:var(--font-grotesk);font-weight:900;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:16px")}>Otros casos destacados</div>
+                <div style={s("display:flex;flex-direction:column;gap:14px")}>
+                  {recCasos.map((rc) => {
+                    const ci = casos.findIndex((x) => x.key === rc.key);
+                    return (
+                      <button
+                        key={rc.key}
+                        onClick={() => { setOpenIdx(ci); const sc = document.querySelector<HTMLElement>(".stanm"); if (sc) sc.scrollTop = 0; }}
+                        style={s("display:block;width:100%;text-align:left;padding:0;border:none;background:none;cursor:pointer")}
+                      >
+                        <div style={s("position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#1a1a1a")}>
+                          {rc.cover ? (
+                            <img src={rc.cover} alt={rc.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
+                          ) : null}
+                          <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 44%,rgba(13,13,13,0.9) 100%)")} />
+                          <div style={s("position:absolute;left:0;right:0;bottom:0;padding:16px")}>
+                            <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:6px")}>{rc.tag}</div>
+                            <h4 style={s("margin:0;font-family:var(--font-grotesk);font-weight:500;font-size:24px;line-height:1;text-transform:uppercase;color:#f5f3ec")}>{rc.title}</h4>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : null}
 
             {nextCaso ? (
               <button

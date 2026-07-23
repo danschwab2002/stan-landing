@@ -3,6 +3,7 @@ import { db, ensureDb } from "@/lib/db";
 import {
   projects,
   projectDisciplines,
+  projectRecommendations,
   type NewProject,
   type Project,
 } from "@/lib/db/schema";
@@ -67,6 +68,9 @@ export async function deleteProject(id: number): Promise<void> {
   await ensureDb();
   // Limpiamos los vínculos M2M a mano (no dependemos del PRAGMA foreign_keys).
   await db.delete(projectDisciplines).where(eq(projectDisciplines.projectId, id));
+  // Recomendaciones en ambos sentidos: este caso como origen y como recomendado.
+  await db.delete(projectRecommendations).where(eq(projectRecommendations.projectId, id));
+  await db.delete(projectRecommendations).where(eq(projectRecommendations.recommendedId, id));
   await db.delete(projects).where(eq(projects.id, id));
 }
 
@@ -92,4 +96,33 @@ export async function setProjectDisciplines(
   await db
     .insert(projectDisciplines)
     .values(clean.map((disciplineId) => ({ projectId, disciplineId })));
+}
+
+/** IDs de los casos recomendados manualmente para un proyecto, en su orden (CMS). */
+export async function getProjectRecommendationIds(projectId: number): Promise<number[]> {
+  await ensureDb();
+  const rows = await db
+    .select({ recommendedId: projectRecommendations.recommendedId })
+    .from(projectRecommendations)
+    .where(eq(projectRecommendations.projectId, projectId))
+    .orderBy(asc(projectRecommendations.sortOrder));
+  return rows.map((r) => r.recommendedId);
+}
+
+/** Reemplaza el set de casos recomendados de un proyecto, respetando el orden dado.
+ *  Un caso nunca se recomienda a sí mismo. Set vacío = sin recomendaciones manuales
+ *  (la landing cae a random). */
+export async function setProjectRecommendations(
+  projectId: number,
+  recommendedIds: number[]
+): Promise<void> {
+  await ensureDb();
+  await db.delete(projectRecommendations).where(eq(projectRecommendations.projectId, projectId));
+  const clean = [...new Set(recommendedIds)].filter(
+    (n) => Number.isFinite(n) && n > 0 && n !== projectId
+  );
+  if (clean.length === 0) return;
+  await db
+    .insert(projectRecommendations)
+    .values(clean.map((recommendedId, i) => ({ projectId, recommendedId, sortOrder: i })));
 }
