@@ -44,7 +44,7 @@ export default async function ProyectosPage() {
     <div>
       <header className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-3xl font-black tracking-tight">Proyectos</h1>
+          <h1 className="font-display text-3xl font-black tracking-[0.07em]">Proyectos</h1>
           <p className="mt-1 text-sm text-black/50">
             {projects.length} {projects.length === 1 ? "elemento" : "elementos"} · lo que
             marques como <strong>destacado + publicado</strong> aparece en la home.

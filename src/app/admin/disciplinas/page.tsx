@@ -36,7 +36,7 @@ export default async function DisciplinasPage() {
     <div>
       <header className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-3xl font-black tracking-tight">Áreas</h1>
+          <h1 className="font-display text-3xl font-black tracking-[0.07em]">Áreas</h1>
           <p className="mt-1 text-sm text-black/50">
             {disciplines.length} {disciplines.length === 1 ? "área" : "áreas"} · las
             disciplinas de <strong>“Qué hacemos”</strong>. Cada proyecto se asigna a una o

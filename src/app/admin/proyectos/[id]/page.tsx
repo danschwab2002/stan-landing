@@ -38,7 +38,7 @@ export default async function EditarProyecto({
       >
         ← Proyectos
       </Link>
-      <h1 className="mb-6 mt-2 font-display text-3xl font-black tracking-tight">
+      <h1 className="mb-6 mt-2 font-display text-3xl font-black tracking-[0.07em]">
         Editar: {project.title}
       </h1>
       <ProjectForm

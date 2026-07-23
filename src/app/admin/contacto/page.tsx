@@ -13,7 +13,7 @@ export default async function ContactoAdmin({
 
   return (
     <div className="max-w-2xl">
-      <h1 className="mb-1 font-display text-3xl font-black tracking-tight">Contacto</h1>
+      <h1 className="mb-1 font-display text-3xl font-black tracking-[0.07em]">Contacto</h1>
       <p className="mb-6 text-sm text-black/50">
         Los dos puntos de contacto de la landing: WhatsApp y agendamiento por Calendly.
       </p>

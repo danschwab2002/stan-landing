@@ -20,7 +20,7 @@ function Family({
     <fieldset className="rounded-xl border border-black/10 bg-[#faf9f5] p-5">
       <legend className="flex items-baseline gap-2 px-1">
         <span className="font-mono text-xs text-black/40">{n}</span>
-        <span className="font-display text-lg font-black">{title}</span>
+        <span className="font-display text-lg font-black tracking-[0.07em]">{title}</span>
       </legend>
       {hint && <p className="mb-4 text-xs text-black/45">{hint}</p>}
       <div className="grid gap-4">{children}</div>

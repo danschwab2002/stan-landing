@@ -21,7 +21,7 @@ export function AdminSidebar() {
   return (
     <aside className="w-56 shrink-0">
       <div className="mb-8">
-        <p className="font-display text-xl font-black tracking-tight">STAN</p>
+        <p className="font-display text-xl font-black tracking-[0.07em]">STAN</p>
         <p className="text-xs uppercase tracking-[0.2em] text-black/45">
           Panel de contenido
         </p>
