@@ -7,7 +7,7 @@ export function Hero() {
     <section id="hero" style={s("position:relative;min-height:100svh;overflow:hidden;background:#0d0d0d;color:#f5f3ec")}>
       {/* Fondo */}
       <div style={s("position:absolute;inset:0;z-index:0")}>
-        <img src="/assets/imagery/hero-home.png" alt="" style={s("width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
+        <img src="/assets/imagery/hero-home.webp" alt="" style={s("width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
       </div>
       {/* Scrim */}
       <div style={s("position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg, rgba(13,13,13,0.66) 0%, rgba(13,13,13,0.28) 22%, rgba(13,13,13,0.2) 55%, rgba(13,13,13,0.8) 88%, rgba(13,13,13,0.95) 100%)")} />
@@ -29,7 +29,7 @@ export function Hero() {
       {/* Tag colgante */}
       <div style={s("position:absolute;top:-12px;left:50%;transform:translateX(-50%);z-index:7;pointer-events:none")}>
         <img
-          src="/assets/imagery/hero-tag.png"
+          src="/assets/imagery/hero-tag.webp"
           alt="We STAN for the vision"
           style={s("display:block;width:clamp(360px,39vw,630px);height:auto;transform-origin:50% 0;animation:stan-sway 7s var(--ease-inout) infinite;filter:drop-shadow(0 22px 30px rgba(0,0,0,0.55))")}
         />

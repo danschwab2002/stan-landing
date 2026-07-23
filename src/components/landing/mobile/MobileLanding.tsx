@@ -70,12 +70,12 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
       {/* HERO */}
       <section ref={heroRef} style={s("position:relative;margin-top:-64px;min-height:720px;overflow:hidden;background:#0d0d0d")}>
         <div style={s("position:absolute;inset:0;z-index:0")}>
-          <img src="/assets/imagery/hero-home.png" alt="" style={s("width:100%;height:100%;object-fit:cover;object-position:72% center;display:block")} />
+          <img src="/assets/imagery/hero-home.webp" alt="" style={s("width:100%;height:100%;object-fit:cover;object-position:72% center;display:block")} />
         </div>
         <div style={s("position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg, rgba(13,13,13,0.72) 0%, rgba(13,13,13,0.28) 26%, rgba(13,13,13,0.28) 52%, rgba(13,13,13,0.86) 84%, rgba(13,13,13,0.98) 100%)")} />
 
         <div style={s("position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:7;pointer-events:none")}>
-          <img src="/assets/imagery/hero-tag.png" alt="We STAN for the vision" style={s("display:block;width:248px;height:auto;transform-origin:50% 0;animation:stan-sway 7s var(--ease-inout) infinite;filter:drop-shadow(0 18px 26px rgba(0,0,0,0.55))")} />
+          <img src="/assets/imagery/hero-tag.webp" alt="We STAN for the vision" style={s("display:block;width:248px;height:auto;transform-origin:50% 0;animation:stan-sway 7s var(--ease-inout) infinite;filter:drop-shadow(0 18px 26px rgba(0,0,0,0.55))")} />
         </div>
 
         <div style={s("position:absolute;left:0;right:0;bottom:0;z-index:8;padding:0 22px 40px")}>
