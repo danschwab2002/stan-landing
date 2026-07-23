@@ -43,8 +43,11 @@ export type Discipline = {
   detail?: DisciplineDetailItem[];
 };
 
-/** "Lo que hicimos" — común a los casos en el diseño. Exportado: la capa de
- *  datos se lo adjunta a cada caso hasta que "Servicios" sea su propia colección. */
+/** "Lo que hicimos" — roles/tareas ejecutados en el proyecto (dirección,
+ *  producción, filmación, post). Es un dato POR CASO, distinto de las Áreas
+ *  ("Qué hacemos" = líneas de servicio de la productora). Hoy default común a
+ *  todos los casos; a futuro, editable por caso desde el panel. NOTA: "Servicios"
+ *  NO es una colección aparte — Servicios = Áreas (consolidado 22/07). */
 export const DEFAULT_SERVICES: ServiceTag[] = [
   { icon: "/assets/imagery/ic-direccion.png", label: "Dirección creativa" },
   { icon: "/assets/imagery/ic-produccion.png", label: "Producción" },

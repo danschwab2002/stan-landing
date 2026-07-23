@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Modelo de contenido consolidado (validación Adriano 22/07): el CMS administra
+// SOLO Proyectos + Áreas. "Servicios" = Áreas (misma entidad, unificadas);
+// Clientes → casos destacados; Reel/Videos verticales → no van como colección
+// (el video se carga dentro de cada proyecto). Ver decisión OS
+// 2026-07-22-modelo-contenido-cms-consolidado.
 const SECTIONS = [
   { label: "Proyectos", href: "/admin/proyectos", enabled: true },
   { label: "Áreas", href: "/admin/disciplinas", enabled: true },
-  { label: "Servicios", href: "#", enabled: false },
-  { label: "Clientes", href: "#", enabled: false },
-  { label: "Reel destacado", href: "#", enabled: false },
-  { label: "Videos verticales", href: "#", enabled: false },
 ];
 
 export function AdminSidebar() {
