@@ -4,13 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 // Modelo de contenido consolidado (validación Adriano 22/07): el CMS administra
-// SOLO Proyectos + Áreas. "Servicios" = Áreas (misma entidad, unificadas);
-// Clientes → casos destacados; Reel/Videos verticales → no van como colección
-// (el video se carga dentro de cada proyecto). Ver decisión OS
-// 2026-07-22-modelo-contenido-cms-consolidado.
+// Proyectos + Áreas (contenido) + Contacto (ajustes globales). "Servicios" = Áreas
+// (misma entidad, unificadas); Clientes → casos destacados; Reel/Videos verticales
+// → no van como colección (el video se carga dentro de cada proyecto). Ver decisión
+// OS 2026-07-22-modelo-contenido-cms-consolidado. Contacto = WhatsApp + Calendly
+// (decisión 2026-07-22-seccion-datos-contacto-cms).
 const SECTIONS = [
   { label: "Proyectos", href: "/admin/proyectos", enabled: true },
   { label: "Áreas", href: "/admin/disciplinas", enabled: true },
+  { label: "Contacto", href: "/admin/contacto", enabled: true },
 ];
 
 export function AdminSidebar() {

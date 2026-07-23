@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { relatedCaso, type Caso, type Discipline } from "@/lib/landing-data";
+import type { SiteSettings } from "@/lib/data/settings";
 import { Hero } from "./Hero";
 import { QueHacemos } from "./QueHacemos";
 import { Marquee } from "./Marquee";
@@ -12,7 +13,7 @@ import { CasoOverlay } from "./CasoOverlay";
 import { DisciplinaOverlay } from "./DisciplinaOverlay";
 import { ReelOverlay } from "./ReelOverlay";
 
-export function DesktopLanding({ casos, disciplines }: { casos: Caso[]; disciplines: Discipline[] }) {
+export function DesktopLanding({ casos, disciplines, settings }: { casos: Caso[]; disciplines: Discipline[]; settings: SiteSettings }) {
   const [hash, setHash] = useState("");
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export function DesktopLanding({ casos, disciplines }: { casos: Caso[]; discipli
       <Casos casos={casos} onOpen={openCaso} />
       <Manifesto />
       <Marquee />
-      <Contacto />
+      <Contacto whatsappUrl={settings.whatsappUrl} calendlyEmbed={settings.calendlyEmbed} />
 
       {activeCaso ? (
         <CasoOverlay caso={activeCaso} related={relatedCaso(activeCaso, casos)} recommended={recommendedCasos} disciplines={disciplines} onOpenCaso={openCaso} onOpenDisc={openDisc} onClose={closeCaso} />

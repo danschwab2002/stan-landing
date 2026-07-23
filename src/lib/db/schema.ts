@@ -90,7 +90,20 @@ export const projectRecommendations = sqliteTable(
   (t) => [primaryKey({ columns: [t.projectId, t.recommendedId] })]
 );
 
+/**
+ * Ajustes globales del sitio (key-value). Datos que no pertenecen a un proyecto
+ * ni a un área: hoy los dos puntos de contacto que Adriano quiere administrar
+ * (validación 22/07) — `whatsapp_url` (link directo) y `calendly_embed` (código
+ * iframe del widget de agendamiento). Key-value a propósito: sumar un ajuste
+ * nuevo es una fila más, sin migrar el esquema.
+ */
+export const settings = sqliteTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").default(""),
+});
+
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type DisciplineRow = typeof disciplines.$inferSelect;
 export type NewDisciplineRow = typeof disciplines.$inferInsert;
+export type SettingRow = typeof settings.$inferSelect;

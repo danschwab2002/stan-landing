@@ -2,6 +2,7 @@ import { DesktopLanding } from "@/components/landing/desktop/DesktopLanding";
 import { MobileLanding } from "@/components/landing/mobile/MobileLanding";
 import { getLandingCasos } from "@/lib/data/landing";
 import { getPublishedDisciplines } from "@/lib/data/disciplines";
+import { getSiteSettings } from "@/lib/data/settings";
 
 // El contenido sale de la base (admin) → render dinámico, sin prerender estático.
 export const dynamic = "force-dynamic";
@@ -15,18 +16,19 @@ export const dynamic = "force-dynamic";
  * El copy único (hero, manifiesto, contacto) sigue fijo en código (`SITE`).
  */
 export default async function Home() {
-  const [casos, disciplines] = await Promise.all([
+  const [casos, disciplines, settings] = await Promise.all([
     getLandingCasos(),
     getPublishedDisciplines(),
+    getSiteSettings(),
   ]);
 
   return (
     <>
       <div className="landing-desktop">
-        <DesktopLanding casos={casos} disciplines={disciplines} />
+        <DesktopLanding casos={casos} disciplines={disciplines} settings={settings} />
       </div>
       <div className="landing-mobile">
-        <MobileLanding casos={casos} disciplines={disciplines} />
+        <MobileLanding casos={casos} disciplines={disciplines} settings={settings} />
       </div>
     </>
   );

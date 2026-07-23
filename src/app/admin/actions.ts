@@ -16,6 +16,7 @@ import {
   getDisciplineRow,
   updateDiscipline,
 } from "@/lib/data/disciplines";
+import { setSiteSettings } from "@/lib/data/settings";
 
 function str(v: FormDataEntryValue | null): string {
   return (v ?? "").toString().trim();
@@ -162,4 +163,17 @@ export async function setDisciplinePublished(formData: FormData) {
   if (!current) return;
   await updateDiscipline(id, { published: !current.published });
   revalidateAll();
+}
+
+// ─── Contacto (ajustes globales del sitio) ───────────────────────────────────
+
+/** Guarda los dos puntos de contacto (WhatsApp + Calendly) desde su formulario. */
+export async function saveContact(formData: FormData) {
+  await setSiteSettings({
+    whatsappUrl: str(formData.get("whatsappUrl")),
+    calendlyEmbed: str(formData.get("calendlyEmbed")),
+  });
+  revalidatePath("/");
+  revalidatePath("/admin/contacto");
+  redirect("/admin/contacto?ok=1");
 }

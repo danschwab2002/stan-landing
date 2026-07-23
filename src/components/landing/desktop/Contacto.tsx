@@ -6,14 +6,25 @@ const FIELD_LABEL = "font-weight:700;font-size:10px;letter-spacing:0.16em;text-t
 const FIELD_VALUE = "font-size:clamp(14px,1.1vw,17px);color:#f5f3ec;text-decoration:none";
 const FIELD_BOX = "padding-top:14px;border-top:1px solid rgba(245,243,236,0.16)";
 
-export function Contacto() {
+export function Contacto({ whatsappUrl, calendlyEmbed }: { whatsappUrl: string; calendlyEmbed: string }) {
   const c = SITE.contact;
   return (
     <>
       <section id="contact" style={s("position:relative;background:#0d0d0d;color:#f5f3ec;min-height:100svh;overflow:hidden;padding:clamp(44px,5vw,80px) clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center")}>
         <div style={s("max-width:1500px;margin:0 auto;width:100%")}>
           <div style={s("display:grid;grid-template-columns:minmax(260px,0.85fr) 1.5fr;gap:clamp(20px,2.6vw,52px);align-items:center")}>
-            <div style={s("border-radius:clamp(16px,2vw,30px);overflow:hidden;aspect-ratio:4/5;background:#1a1a1a")} />
+            {/* Agendamiento embebido (Calendly, editable desde el CMS). El HTML lo
+                pega Adriano en el panel → dueño del sitio, embed confiable. Si no
+                hay código cargado, se muestra el placeholder de siempre. */}
+            {calendlyEmbed ? (
+              <div
+                className="calendly-embed"
+                style={s("border-radius:clamp(16px,2vw,30px);overflow:hidden;aspect-ratio:4/5;background:#fff")}
+                dangerouslySetInnerHTML={{ __html: calendlyEmbed }}
+              />
+            ) : (
+              <div style={s("border-radius:clamp(16px,2vw,30px);overflow:hidden;aspect-ratio:4/5;background:#1a1a1a")} />
+            )}
 
             <div style={s("position:relative")}>
               <div style={s("display:flex;flex-wrap:wrap;align-items:flex-start;gap:clamp(18px,2.4vw,44px)")}>
@@ -28,26 +39,17 @@ export function Contacto() {
                 </p>
               </div>
 
+              {/* Puntos de contacto: solo WhatsApp (Adriano, 22/07); el agendamiento
+                  es el Calendly embebido a la izquierda. Instagram + Ubicación quedan
+                  como contexto de marca, no como vías de contacto. */}
               <div style={s("margin-top:clamp(28px,4vw,66px);display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.2vw,42px);max-width:660px")}>
                 <div style={s(FIELD_BOX)}>
-                  <div style={s(FIELD_LABEL)}>Email</div>
-                  <a href={`mailto:${c.email}`} style={s(FIELD_VALUE)}>{c.email}</a>
+                  <div style={s(FIELD_LABEL)}>WhatsApp</div>
+                  <a href={whatsappUrl || "#"} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>Escribinos</a>
                 </div>
                 <div style={s(FIELD_BOX)}>
                   <div style={s(FIELD_LABEL)}>Instagram</div>
                   <a href="#" style={s(FIELD_VALUE)}>{c.instagram}</a>
-                </div>
-                <div style={s(FIELD_BOX)}>
-                  <div style={s(FIELD_LABEL)}>WhatsApp</div>
-                  <a href={`https://wa.me/${c.whatsapp}`} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>Escribinos</a>
-                </div>
-                <div style={s(FIELD_BOX)}>
-                  <div style={s(FIELD_LABEL)}>Agendá una llamada</div>
-                  <a href={c.calendly || "#"} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>Calendly</a>
-                </div>
-                <div style={s(FIELD_BOX)}>
-                  <div style={s(FIELD_LABEL)}>Teléfono</div>
-                  <span style={s(FIELD_VALUE)}>{c.phone}</span>
                 </div>
                 <div style={s(FIELD_BOX)}>
                   <div style={s(FIELD_LABEL)}>Ubicación</div>

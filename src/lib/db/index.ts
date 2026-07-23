@@ -1,7 +1,7 @@
 import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
-import { CASOS, DISCIPLINES } from "@/lib/landing-data";
+import { CASOS, DISCIPLINES, SITE } from "@/lib/landing-data";
 
 /**
  * Cliente + drizzle PEREZOSOS: no abrir la conexión al importar el módulo.
@@ -114,6 +114,14 @@ async function init() {
     )
   `);
 
+  await getClient().execute(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT DEFAULT ''
+    )
+  `);
+  await seedSettings();
+
   const dCount = Number(
     (await getClient().execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
   );
@@ -146,6 +154,25 @@ async function seedDisciplines() {
         now,
         now,
       ],
+    });
+  }
+}
+
+/**
+ * Siembra los ajustes globales una sola vez (INSERT OR IGNORE: nunca pisa un
+ * valor que Adriano ya haya cargado desde el CMS). `whatsapp_url` arranca con
+ * el número placeholder de landing-data para no romper el link existente;
+ * `calendly_embed` vacío hasta que Adriano pegue el iframe.
+ */
+async function seedSettings() {
+  const defaults: Record<string, string> = {
+    whatsapp_url: `https://wa.me/${SITE.contact.whatsapp}`,
+    calendly_embed: SITE.contact.calendly,
+  };
+  for (const [key, value] of Object.entries(defaults)) {
+    await getClient().execute({
+      sql: `INSERT OR IGNORE INTO settings (key, value) VALUES (?,?)`,
+      args: [key, value],
     });
   }
 }

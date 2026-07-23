@@ -4,10 +4,11 @@ import { useRef, useState } from "react";
 import { s } from "../style";
 import { ArrowRight, ChevronDown, PlayCircle, Close } from "../icons";
 import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, type Caso, type Discipline } from "@/lib/landing-data";
+import type { SiteSettings } from "@/lib/data/settings";
 
 type SectionKey = "hero" | "work" | "casos" | "manifesto" | "contact";
 
-export function MobileLanding({ casos, disciplines }: { casos: Caso[]; disciplines: Discipline[] }) {
+export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[]; disciplines: Discipline[]; settings: SiteSettings }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openIdx, setOpenIdx] = useState(-1);
   const [discIdx, setDiscIdx] = useState(-1); // overlay de disciplina (navegación cruzada, G11)
@@ -224,7 +225,13 @@ export function MobileLanding({ casos, disciplines }: { casos: Caso[]; disciplin
 
       {/* 04 · CONTACTO */}
       <section ref={contactRef} style={s("position:relative;background:#0d0d0d;padding:44px 22px 40px")}>
-        <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#1a1a1a;margin-bottom:28px")} />
+        {/* Agendamiento embebido (Calendly, editable desde el CMS). Fallback al
+            placeholder si Adriano todavía no cargó el código. */}
+        {settings.calendlyEmbed ? (
+          <div className="calendly-embed" style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#fff;margin-bottom:28px")} dangerouslySetInnerHTML={{ __html: settings.calendlyEmbed }} />
+        ) : (
+          <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#1a1a1a;margin-bottom:28px")} />
+        )}
         <h2 style={s("margin:0 0 18px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:66px;line-height:0.84;letter-spacing:0.02em;color:var(--stan-acid);text-transform:uppercase")}>
           {SITE.contact.title[0]}
           <br />
@@ -236,11 +243,10 @@ export function MobileLanding({ casos, disciplines }: { casos: Caso[]; disciplin
 
         <div style={s("display:flex;flex-direction:column")}>
           {[
-            { label: "Email", value: SITE.contact.email, href: `mailto:${SITE.contact.email}` },
+            // Punto de contacto: solo WhatsApp (Adriano 22/07); agendar = Calendly
+            // embebido arriba. Instagram + Ubicación quedan como contexto de marca.
+            { label: "WhatsApp", value: "Escribinos", href: settings.whatsappUrl || "#" },
             { label: "Instagram", value: SITE.contact.instagram, href: "#" },
-            { label: "WhatsApp", value: "Escribinos", href: `https://wa.me/${SITE.contact.whatsapp}` },
-            { label: "Agendá una llamada", value: "Calendly", href: SITE.contact.calendly || "#" },
-            { label: "Teléfono", value: SITE.contact.phone },
             { label: "Ubicación", value: SITE.contact.location, last: true },
           ].map((f) => (
             <div key={f.label} style={s(`padding:18px 0;border-top:1px solid rgba(245,243,236,0.16)${f.last ? ";border-bottom:1px solid rgba(245,243,236,0.16)" : ""}`)}>

@@ -211,6 +211,16 @@ h1, h2, h3, h4, h5, h6, p { margin: 0; }
 .caso-card { flex: 1 1 0%; transition: flex 460ms var(--ease-out); }
 .caso-card:hover { flex: 2.6 1 0%; }
 
+/* Embed de Calendly (código pegado desde el CMS): el iframe llena su contenedor */
+.calendly-embed { display: block; width: 100%; height: 100%; }
+.calendly-embed iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100%;
+  border: 0;
+  display: block;
+}
+
 /* Toggle desktop / mobile (dos árboles, un solo layout visible) */
 .landing-desktop { display: block; }
 .landing-mobile { display: none; }
