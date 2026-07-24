@@ -202,16 +202,19 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
           <span style={s("font-weight:700;font-size:13px;color:var(--stan-acid)")}>{SITE.manifesto.n}</span>
           <span style={s("font-weight:500;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;color:#f5f3ec")}>{SITE.manifesto.label}</span>
         </div>
-        <div style={s("position:relative;width:326px;max-width:100%;margin:0 auto;aspect-ratio:1;display:flex;align-items:center;justify-content:center")}>
-          <svg viewBox="0 0 500 500" style={s("position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:stan-rotate 100s linear infinite")}>
-            <defs>
-              <path id="m-ring" d="M250,250 m-205,0 a205,205 0 1,1 410,0 a205,205 0 1,1 -410,0" />
-            </defs>
-            <text fill="rgba(245,243,236,0.9)" style={s("font-family:var(--font-grotesk);font-weight:500;font-size:19px;letter-spacing:0.01em")}>
-              <textPath href="#m-ring" startOffset="0%">{SITE.manifesto.ring}</textPath>
-            </text>
-          </svg>
-          <div style={s("width:190px;height:130px")} />
+        {/* Recurso oficial en 2 capas: anillo (gira) + lettering "We Manifest" (fijo). A todo
+            el ancho útil para que el texto lateral del anillo se lea en mobile. */}
+        <div style={s("position:relative;width:100%;max-width:420px;aspect-ratio:1600/1766;margin:0 auto")}>
+          <img
+            src="/assets/imagery/manifiesto-ring.webp"
+            alt="We stand for the vision. Creemos que una buena idea merece existir; que el talento sin ejecución es potencial desperdiciado; que las marcas más memorables son las que se animan a construir algo diferente; y que las mejores historias todavía no fueron producidas; que la creatividad no sirve si no genera movimiento."
+            style={s("position:absolute;inset:0;width:100%;height:100%;animation:stan-rotate 90s linear infinite")}
+          />
+          <img
+            src="/assets/imagery/manifiesto-letter.webp"
+            alt="We Manifest"
+            style={s("position:absolute;inset:0;width:100%;height:100%")}
+          />
         </div>
         <div style={s("display:flex;align-items:center;gap:10px;justify-content:center;margin-top:20px")}>
           <img src="/assets/logos/iso-acid.png" alt="STAN iso" style={s("display:block;width:26px;height:auto;flex:none")} />

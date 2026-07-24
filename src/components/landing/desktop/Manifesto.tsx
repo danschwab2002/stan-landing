@@ -1,23 +1,23 @@
 import { s } from "../style";
-import { ArrowRight } from "../icons";
 import { SITE } from "@/lib/landing-data";
 
 export function Manifesto() {
   return (
-    <section id="manifesto" style={s("position:relative;background:#0d0d0d;color:#f5f3ec;min-height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:clamp(40px,6vw,88px)")}>
-      <div style={s("position:relative;width:min(80vh,760px);max-width:88vw;aspect-ratio:1;display:flex;align-items:center;justify-content:center")}>
-        <svg viewBox="0 0 500 500" style={s("position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:stan-rotate 100s linear infinite")}>
-          <defs>
-            <path id="manifesto-ring" d="M250,250 m-205,0 a205,205 0 1,1 410,0 a205,205 0 1,1 -410,0" />
-          </defs>
-          <text fill="rgba(245,243,236,0.9)" style={s("font-family:var(--font-grotesk);font-weight:500;font-size:19px;letter-spacing:0.01em")}>
-            <textPath href="#manifesto-ring" startOffset="0%">
-              {SITE.manifesto.ring}
-            </textPath>
-          </text>
-        </svg>
-        {/* Lettering central ('We Manifest') — slot del CMS, hoy vacío */}
-        <div style={s("width:clamp(160px,26vh,280px);height:clamp(120px,18vh,190px)")} />
+    <section id="manifesto" style={s("position:relative;background:#0d0d0d;color:#f5f3ec;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:clamp(36px,5vh,72px) clamp(24px,5vw,72px) clamp(72px,10vh,144px)")}>
+      {/* Manifiesto — recurso gráfico oficial de BB Factor, partido en 2 capas:
+          el ANILLO de texto (gira, centro hueco) + el lettering "We Manifest" (fijo, encima).
+          Mismo aspecto que el asset (1600x1766) → ambas capas llenan el contenedor y alinean. */}
+      <div style={s("position:relative;width:min(84vh,800px);max-width:92vw;aspect-ratio:1600/1766")}>
+        <img
+          src="/assets/imagery/manifiesto-ring.webp"
+          alt="We stand for the vision. Creemos que una buena idea merece existir; que el talento sin ejecución es potencial desperdiciado; que las marcas más memorables son las que se animan a construir algo diferente; y que las mejores historias todavía no fueron producidas; que la creatividad no sirve si no genera movimiento."
+          style={s("position:absolute;inset:0;width:100%;height:100%;animation:stan-rotate 90s linear infinite")}
+        />
+        <img
+          src="/assets/imagery/manifiesto-letter.webp"
+          alt="We Manifest"
+          style={s("position:absolute;inset:0;width:100%;height:100%")}
+        />
       </div>
 
       <div style={s("position:absolute;left:clamp(24px,5vw,72px);bottom:clamp(28px,3.4vw,46px);display:flex;align-items:center;gap:10px")}>
@@ -26,15 +26,6 @@ export function Manifesto() {
           {SITE.tagline[0]}
           <br />
           {SITE.tagline[1]}
-        </div>
-      </div>
-
-      <div style={s("position:absolute;right:clamp(64px,7vw,120px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:clamp(120px,20vh,220px);pointer-events:none")}>
-        <ArrowRight width={70} height={14} stroke="rgba(245,243,236,0.9)" />
-        <div style={s("font-family:var(--font-grotesk);font-weight:500;font-size:clamp(15px,1.4vw,20px);line-height:1.15;letter-spacing:0.02em;text-transform:uppercase;color:#f5f3ec;text-align:right")}>
-          Nuestro
-          <br />
-          Manifiesto
         </div>
       </div>
     </section>
