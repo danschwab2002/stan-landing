@@ -40,6 +40,8 @@ export type Discipline = {
   key: string;
   title: string;
   icon: string;
+  /** Imagen grande del área (recuadro de "Qué hacemos"). Vacío = placeholder. */
+  image?: string;
   desc: string;
   items: string[];
   /** Detalle para el overlay (solo Content lo trae en el diseño) */

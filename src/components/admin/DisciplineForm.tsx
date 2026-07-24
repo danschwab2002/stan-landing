@@ -83,6 +83,26 @@ export function DisciplineForm({ discipline: d }: { discipline?: DisciplineRow }
           <img src={d.icon} alt="Ícono actual" className="h-9 w-auto" />
         ) : null}
         <div>
+          <label className={labelCls}>Imagen del área (URL)</label>
+          <input
+            name="image"
+            defaultValue={d?.image ?? ""}
+            className={inputCls}
+            placeholder="https://static.wixstatic.com/…  ó  /assets/imagery/…"
+          />
+          <p className="mt-1 text-xs text-black/40">
+            La imagen grande del recuadro del área en “Qué hacemos”. Si la dejás vacía, queda el recuadro gris.
+          </p>
+          {d?.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={d.image}
+              alt="Imagen actual"
+              className="mt-2 aspect-[16/11] w-56 rounded-lg object-cover"
+            />
+          ) : null}
+        </div>
+        <div>
           <label className={labelCls}>Descripción</label>
           <textarea
             name="description"

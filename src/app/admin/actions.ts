@@ -135,6 +135,7 @@ export async function saveDiscipline(formData: FormData) {
     key: str(formData.get("key")) || slugify(title),
     title,
     icon: str(formData.get("icon")),
+    image: str(formData.get("image")),
     description: str(formData.get("description")),
     items: JSON.stringify(lines(formData.get("items"))),
     detail: JSON.stringify(parseDetail(formData.get("detail"))),

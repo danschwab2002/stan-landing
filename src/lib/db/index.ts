@@ -89,6 +89,7 @@ async function init() {
       key TEXT NOT NULL UNIQUE,
       title TEXT NOT NULL,
       icon TEXT DEFAULT '',
+      image TEXT DEFAULT '',
       description TEXT DEFAULT '',
       items TEXT DEFAULT '[]',
       detail TEXT DEFAULT '[]',
@@ -124,6 +125,9 @@ async function init() {
   `);
   await seedSettings();
 
+  // Migraciones ligeras para DBs ya creadas (SQLite no tiene ADD COLUMN IF NOT EXISTS).
+  await ensureColumn("disciplines", "image", "image TEXT DEFAULT ''");
+
   const dCount = Number(
     (await getClient().execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
   );
@@ -133,6 +137,13 @@ async function init() {
     (await getClient().execute(`SELECT COUNT(*) AS c FROM projects`)).rows[0]?.c ?? 0
   );
   if (pCount === 0) await seedProjects();
+}
+
+/** Agrega una columna si todavía no existe (migración idempotente para DBs viejas). */
+async function ensureColumn(table: string, column: string, ddl: string) {
+  const info = await getClient().execute(`PRAGMA table_info(${table})`);
+  const exists = info.rows.some((r) => String(r.name) === column);
+  if (!exists) await getClient().execute(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
 }
 
 /** Siembra las 5 disciplinas desde DISCIPLINES (landing-data). */

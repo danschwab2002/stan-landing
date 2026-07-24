@@ -44,6 +44,7 @@ export const disciplines = sqliteTable("disciplines", {
   key: text("key").notNull().unique(), // slug estable (content, streaming, …)
   title: text("title").notNull(),
   icon: text("icon").default(""),
+  image: text("image").default(""), // imagen grande del área (recuadro de "Qué hacemos" en la home)
   description: text("description").default(""), // `desc` es palabra reservada en SQL
   items: text("items").default("[]"), // JSON: string[]
   detail: text("detail").default("[]"), // JSON: { title, desc }[]

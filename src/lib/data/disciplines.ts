@@ -25,6 +25,7 @@ function toDiscipline(r: DisciplineRow): Discipline {
     key: r.key,
     title: r.title,
     icon: r.icon ?? "",
+    image: r.image ?? "",
     desc: r.description ?? "",
     items: parseArr<string[]>(r.items, []),
     detail: detail.length > 0 ? detail : undefined,

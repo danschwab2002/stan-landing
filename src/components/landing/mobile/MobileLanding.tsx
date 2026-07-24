@@ -133,7 +133,11 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
               >
                 <img src={d.icon} alt="" style={s("display:block;height:30px;width:auto;align-self:flex-start;margin-bottom:14px")} />
                 <h3 style={s("font-family:var(--font-grotesk);font-weight:900;font-size:26px;letter-spacing:-0.01em;line-height:1;margin:0 0 16px;color:var(--stan-acid)")}>{d.title}</h3>
-                <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:18px")} />
+                <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:18px")}>
+                  {d.image ? (
+                    <img src={d.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                  ) : null}
+                </div>
                 <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.84);margin:0")}>{d.desc}</p>
                 <ul style={s("list-style:none;margin:20px 0 0;padding:16px 0 0;border-top:1px solid rgba(245,243,236,0.16);display:flex;flex-direction:column;gap:11px")}>
                   {d.items.map((it) => (
