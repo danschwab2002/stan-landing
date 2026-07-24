@@ -1,7 +1,8 @@
 import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
-import { CASOS, DISCIPLINES, SITE } from "@/lib/landing-data";
+import { DISCIPLINES, SITE } from "@/lib/landing-data";
+import { SEED_PROJECTS } from "./seed-data";
 
 /**
  * Cliente + drizzle PEREZOSOS: no abrir la conexión al importar el módulo.
@@ -48,9 +49,10 @@ export const db = new Proxy({} as DB, {
  * Init perezoso: crea las tablas si no existen y siembra contenido de ejemplo
  * la primera vez. Memoizado para correr una sola vez por proceso.
  *
- * El seed sale de `landing-data.ts` (CASOS + DISCIPLINES) — la MISMA fuente que
- * usaba el frontend estático — para que la landing recableada se vea idéntica.
- * En producción, esto lo reemplazan las migraciones de Drizzle.
+ * Los proyectos salen de `seed-data.ts` (carga inicial real, export de Wix del
+ * 2026-07-24); las disciplinas/áreas de `landing-data.ts` (DISCIPLINES). El seed
+ * solo corre con la tabla vacía → en prod, resetear la DB re-siembra los reales.
+ * A partir de ahí el CMS es la fuente de verdad.
  */
 let ready: Promise<void> | null = null;
 export function ensureDb(): Promise<void> {
@@ -177,7 +179,7 @@ async function seedSettings() {
   }
 }
 
-/** Siembra los proyectos desde CASOS (landing-data) + su relación M2M con disciplinas. */
+/** Siembra los proyectos reales desde SEED_PROJECTS (seed-data) + su relación M2M con disciplinas. */
 async function seedProjects() {
   const now = new Date().toISOString();
 
@@ -186,35 +188,34 @@ async function seedProjects() {
   const discIdByKey = new Map<string, number>();
   for (const r of drows.rows) discIdByKey.set(String(r.key), Number(r.id));
 
-  for (let i = 0; i < CASOS.length; i++) {
-    const c = CASOS[i];
+  for (const p of SEED_PROJECTS) {
     const ins = await getClient().execute({
       sql: `INSERT INTO projects
         (title, client, year, category, location, short_desc, long_desc, credits,
          cover_url, video_url, slug, published, featured, sort_order, created_at, updated_at)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       args: [
-        c.titleLines.join(" "), // título en caso normal; la vista lo pasa a mayúsculas
-        c.client ?? "",
-        c.year ?? null,
-        c.tag, // etiqueta corta de la tarjeta
-        "",
-        c.lead,
-        c.body,
-        "",
-        c.cover ?? "",
-        "",
-        c.key,
-        1,
-        1,
-        i + 1,
+        p.title,
+        p.client,
+        p.year,
+        p.category,
+        p.location,
+        p.shortDesc,
+        p.longDesc,
+        p.credits,
+        p.coverUrl,
+        p.videoUrl,
+        p.slug,
+        p.published ? 1 : 0,
+        p.featured ? 1 : 0,
+        p.sortOrder,
         now,
         now,
       ],
     });
     const projectId = Number(ins.lastInsertRowid);
 
-    for (const dk of c.disciplines ?? []) {
+    for (const dk of p.disciplines ?? []) {
       const did = discIdByKey.get(dk);
       if (!did) continue;
       await getClient().execute({
