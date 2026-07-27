@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/app/admin/login/actions";
 
 // Modelo de contenido consolidado (validación Adriano 22/07): el CMS administra
 // Proyectos + Áreas (contenido) + Contacto (ajustes globales). "Servicios" = Áreas
@@ -55,13 +56,21 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      <div className="mt-8 border-t border-black/10 pt-4">
+      <div className="mt-8 space-y-3 border-t border-black/10 pt-4">
         <Link
           href="/"
-          className="text-xs font-semibold uppercase tracking-wider text-black/50 transition-colors hover:text-[#16170f]"
+          className="block text-xs font-semibold uppercase tracking-wider text-black/50 transition-colors hover:text-[#16170f]"
         >
           ← Ver el sitio
         </Link>
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="text-xs font-semibold uppercase tracking-wider text-black/50 transition-colors hover:text-[#16170f]"
+          >
+            Cerrar sesión
+          </button>
+        </form>
       </div>
     </aside>
   );

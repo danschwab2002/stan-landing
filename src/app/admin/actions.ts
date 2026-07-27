@@ -17,9 +17,20 @@ import {
   updateDiscipline,
 } from "@/lib/data/disciplines";
 import { setSiteSettings } from "@/lib/data/settings";
+import { requireAuth } from "@/lib/auth-server";
 
 function str(v: FormDataEntryValue | null): string {
   return (v ?? "").toString().trim();
+}
+/** Solo deja pasar URLs http(s) o vacío; descarta javascript:/data:/etc. (anti-XSS en href). */
+function httpUrl(v: string): string {
+  if (!v) return "";
+  try {
+    const u = new URL(v);
+    return u.protocol === "http:" || u.protocol === "https:" ? v : "";
+  } catch {
+    return "";
+  }
 }
 function bool(v: FormDataEntryValue | null): boolean {
   const s = str(v).toLowerCase();
@@ -65,6 +76,7 @@ function revalidateAll() {
 
 /** Crea o actualiza un proyecto desde el formulario del molde. */
 export async function saveProject(formData: FormData) {
+  await requireAuth();
   const id = str(formData.get("id"));
   const title = str(formData.get("title"));
   const yearRaw = str(formData.get("year"));
@@ -78,8 +90,8 @@ export async function saveProject(formData: FormData) {
     shortDesc: str(formData.get("shortDesc")),
     longDesc: str(formData.get("longDesc")),
     credits: str(formData.get("credits")),
-    coverUrl: str(formData.get("coverUrl")),
-    videoUrl: str(formData.get("videoUrl")),
+    coverUrl: httpUrl(str(formData.get("coverUrl"))),
+    videoUrl: httpUrl(str(formData.get("videoUrl"))),
     slug: str(formData.get("slug")) || slugify(title),
     published: bool(formData.get("published")),
     featured: bool(formData.get("featured")),
@@ -105,6 +117,7 @@ export async function saveProject(formData: FormData) {
 }
 
 export async function removeProject(formData: FormData) {
+  await requireAuth();
   const id = Number(str(formData.get("id")));
   await deleteProject(id);
   revalidateAll();
@@ -113,6 +126,7 @@ export async function removeProject(formData: FormData) {
 
 /** Toggle inline de publicado/destacado desde la lista. */
 export async function setFlag(formData: FormData) {
+  await requireAuth();
   const id = Number(str(formData.get("id")));
   const field = str(formData.get("field")); // "published" | "featured"
   const current = await getProject(id);
@@ -128,6 +142,7 @@ export async function setFlag(formData: FormData) {
 
 /** Crea o actualiza una disciplina desde su formulario. */
 export async function saveDiscipline(formData: FormData) {
+  await requireAuth();
   const id = str(formData.get("id"));
   const title = str(formData.get("title"));
 
@@ -135,7 +150,7 @@ export async function saveDiscipline(formData: FormData) {
     key: str(formData.get("key")) || slugify(title),
     title,
     icon: str(formData.get("icon")),
-    image: str(formData.get("image")),
+    image: httpUrl(str(formData.get("image"))),
     description: str(formData.get("description")),
     items: JSON.stringify(lines(formData.get("items"))),
     detail: JSON.stringify(parseDetail(formData.get("detail"))),
@@ -151,6 +166,7 @@ export async function saveDiscipline(formData: FormData) {
 }
 
 export async function removeDiscipline(formData: FormData) {
+  await requireAuth();
   const id = Number(str(formData.get("id")));
   await deleteDiscipline(id);
   revalidateAll();
@@ -159,6 +175,7 @@ export async function removeDiscipline(formData: FormData) {
 
 /** Toggle inline de publicado desde la lista de disciplinas. */
 export async function setDisciplinePublished(formData: FormData) {
+  await requireAuth();
   const id = Number(str(formData.get("id")));
   const current = await getDisciplineRow(id);
   if (!current) return;
@@ -170,9 +187,10 @@ export async function setDisciplinePublished(formData: FormData) {
 
 /** Guarda los dos puntos de contacto (WhatsApp + Calendly) desde su formulario. */
 export async function saveContact(formData: FormData) {
+  await requireAuth();
   await setSiteSettings({
-    whatsappUrl: str(formData.get("whatsappUrl")),
-    calendlyUrl: str(formData.get("calendlyUrl")),
+    whatsappUrl: httpUrl(str(formData.get("whatsappUrl"))),
+    calendlyUrl: httpUrl(str(formData.get("calendlyUrl"))),
   });
   revalidatePath("/");
   revalidatePath("/admin/contacto");
