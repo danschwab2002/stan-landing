@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { s } from "../style";
 import { ArrowLeft, ArrowRight, PlayCircle } from "../icons";
 import { disciplineTitle, type Caso, type Discipline } from "@/lib/landing-data";
@@ -39,8 +40,18 @@ export function CasoOverlay({
   // Área del caso relacionado para el "siguiente proyecto" (feedback Adriano 20/07)
   const relatedArea = related?.disciplines?.[0] ? disciplineTitle(related.disciplines[0], disciplines) : null;
   const areas = caso.disciplines ?? []; // navegación cruzada caso → sus áreas (G11)
+
+  // Al navegar de un caso a otro (grilla "otros casos destacados" / "siguiente
+  // proyecto"), el overlay sigue montado y conserva su scroll → quedabas a la
+  // altura de la sección de recomendados. Reseteamos el contenedor al top cuando
+  // cambia el caso, como si abrieras una pagina nueva (feedback Dan 27/07).
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    scrollRef.current?.scrollTo(0, 0);
+  }, [caso.key]);
+
   return (
-    <div style={s("position:fixed;inset:0;z-index:70;background:#0d0d0d;color:#f5f3ec;overflow:auto;font-family:var(--font-grotesk)")}>
+    <div ref={scrollRef} style={s("position:fixed;inset:0;z-index:70;background:#0d0d0d;color:#f5f3ec;overflow:auto;font-family:var(--font-grotesk)")}>
       <OverlayNav />
 
       <div style={s("padding:clamp(4px,1vw,14px) clamp(24px,5vw,64px) clamp(20px,2.6vw,40px);display:grid;grid-template-columns:auto minmax(0,1.15fr) minmax(0,1fr);gap:clamp(20px,3vw,56px);align-items:stretch")}>
