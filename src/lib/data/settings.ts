@@ -5,19 +5,19 @@ import { settings } from "@/lib/db/schema";
 /**
  * Ajustes globales del sitio que Adriano administra desde el CMS. Hoy los dos
  * puntos de contacto que dejó activos (validación 22/07): el link directo de
- * WhatsApp y el iframe del widget de Calendly. Se guardan como filas key-value
+ * WhatsApp y la URL del calendario de Calendly. Se guardan como filas key-value
  * en `settings`; acá se exponen como un objeto tipado para el frontend.
  */
 export type SiteSettings = {
   /** Link completo al que redirige el botón/campo de WhatsApp (ej. https://wa.me/549…). */
   whatsappUrl: string;
-  /** Código HTML del iframe de Calendly a embeber en la sección de contacto. */
-  calendlyEmbed: string;
+  /** URL del calendario de Calendly (ej. https://calendly.com/stan/…); se abre en popup flotante. */
+  calendlyUrl: string;
 };
 
 const KEYS = {
   whatsappUrl: "whatsapp_url",
-  calendlyEmbed: "calendly_embed",
+  calendlyUrl: "calendly_url",
 } as const;
 
 export async function getSiteSettings(): Promise<SiteSettings> {
@@ -29,7 +29,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   const map = new Map(rows.map((r) => [r.key, r.value ?? ""]));
   return {
     whatsappUrl: map.get(KEYS.whatsappUrl) ?? "",
-    calendlyEmbed: map.get(KEYS.calendlyEmbed) ?? "",
+    calendlyUrl: map.get(KEYS.calendlyUrl) ?? "",
   };
 }
 
@@ -38,7 +38,7 @@ export async function setSiteSettings(data: SiteSettings): Promise<void> {
   await ensureDb();
   const pairs: [string, string][] = [
     [KEYS.whatsappUrl, data.whatsappUrl],
-    [KEYS.calendlyEmbed, data.calendlyEmbed],
+    [KEYS.calendlyUrl, data.calendlyUrl],
   ];
   for (const [key, value] of pairs) {
     await db

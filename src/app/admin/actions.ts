@@ -172,7 +172,7 @@ export async function setDisciplinePublished(formData: FormData) {
 export async function saveContact(formData: FormData) {
   await setSiteSettings({
     whatsappUrl: str(formData.get("whatsappUrl")),
-    calendlyEmbed: str(formData.get("calendlyEmbed")),
+    calendlyUrl: str(formData.get("calendlyUrl")),
   });
   revalidatePath("/");
   revalidatePath("/admin/contacto");

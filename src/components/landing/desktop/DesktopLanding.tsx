@@ -56,13 +56,13 @@ export function DesktopLanding({ casos, disciplines, settings }: { casos: Caso[]
 
   return (
     <div style={{ fontFamily: "var(--font-grotesk)" }}>
-      <Hero />
+      <Hero calendlyUrl={settings.calendlyUrl} />
       <QueHacemos disciplines={disciplines} casos={casos} onOpen={openDisc} />
       <Marquee />
       <Casos casos={casos} onOpen={openCaso} />
       <Manifesto />
       <Marquee />
-      <Contacto whatsappUrl={settings.whatsappUrl} calendlyEmbed={settings.calendlyEmbed} />
+      <Contacto whatsappUrl={settings.whatsappUrl} calendlyUrl={settings.calendlyUrl} />
 
       {activeCaso ? (
         <CasoOverlay caso={activeCaso} related={relatedCaso(activeCaso, casos)} recommended={recommendedCasos} disciplines={disciplines} onOpenCaso={openCaso} onOpenDisc={openDisc} onClose={closeCaso} />

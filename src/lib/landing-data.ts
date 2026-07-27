@@ -228,9 +228,12 @@ export const SITE = {
     phone: "+54 11 1234 5678",
     // Accesos directos pedidos por Adriano (20/07). Placeholders a confirmar:
     // - whatsapp: número real de Stan (wa.me sin "+" ni espacios)
-    // - calendly: cuenta/calendario a definir (nunca usaron Calendly)
+    // - calendly: URL del calendario (se abre en popup); editable desde el CMS
     whatsapp: "5491112345678", // TODO: número real de Stan
-    calendly: "", // TODO: URL de Calendly a definir con Adriano
+    calendly: "", // TODO: URL de Calendly a definir con Adriano (semilla del CMS)
+    // Imagen del recuadro de la sección Contacto ("Let's build something").
+    // HARDCODED a propósito (no editable desde el CMS). Vacío → placeholder gris.
+    image: "", // TODO: imagen definitiva (pendiente de Adriano)
     location: "Buenos Aires, Argentina",
   },
   footer: {

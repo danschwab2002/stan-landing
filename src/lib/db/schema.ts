@@ -94,8 +94,8 @@ export const projectRecommendations = sqliteTable(
 /**
  * Ajustes globales del sitio (key-value). Datos que no pertenecen a un proyecto
  * ni a un área: hoy los dos puntos de contacto que Adriano quiere administrar
- * (validación 22/07) — `whatsapp_url` (link directo) y `calendly_embed` (código
- * iframe del widget de agendamiento). Key-value a propósito: sumar un ajuste
+ * (validación 22/07) — `whatsapp_url` (link directo) y `calendly_url` (URL del
+ * calendario, se abre en popup flotante). Key-value a propósito: sumar un ajuste
  * nuevo es una fila más, sin migrar el esquema.
  */
 export const settings = sqliteTable("settings", {

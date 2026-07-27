@@ -175,12 +175,12 @@ async function seedDisciplines() {
  * Siembra los ajustes globales una sola vez (INSERT OR IGNORE: nunca pisa un
  * valor que Adriano ya haya cargado desde el CMS). `whatsapp_url` arranca con
  * el número placeholder de landing-data para no romper el link existente;
- * `calendly_embed` vacío hasta que Adriano pegue el iframe.
+ * `calendly_url` vacío hasta que Adriano pegue el link de su calendario.
  */
 async function seedSettings() {
   const defaults: Record<string, string> = {
     whatsapp_url: `https://wa.me/${SITE.contact.whatsapp}`,
-    calendly_embed: SITE.contact.calendly,
+    calendly_url: SITE.contact.calendly,
   };
   for (const [key, value] of Object.entries(defaults)) {
     await getClient().execute({

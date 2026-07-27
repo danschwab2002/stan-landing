@@ -59,16 +59,16 @@ export function ContactForm({ settings, saved }: { settings: SiteSettings; saved
       <Family
         n="2"
         title="Calendly"
-        hint="Pegá el código del widget inline de Calendly. En Calendly: Share → Add to website → Inline Embed → copiás el código y lo pegás acá tal cual. Si lo dejás vacío, en la sección de contacto se muestra un placeholder."
+        hint="Pegá el link de tu calendario de Calendly (ej. https://calendly.com/stan/primera-reunion). En Calendly lo encontrás en Share → Copy link. El botón “Agendá una llamada” de la landing lo abre en una ventana flotante. Si lo dejás vacío, el botón lleva a la sección de contacto."
       >
         <div>
-          <label className={labelCls}>Código iframe (embed)</label>
-          <textarea
-            name="calendlyEmbed"
-            rows={5}
-            defaultValue={settings.calendlyEmbed}
-            className={`${inputCls} font-mono text-xs`}
-            placeholder='<iframe src="https://calendly.com/stan/30min" width="100%" height="100%" frameborder="0"></iframe>'
+          <label className={labelCls}>Link de Calendly</label>
+          <input
+            name="calendlyUrl"
+            type="url"
+            defaultValue={settings.calendlyUrl}
+            className={inputCls}
+            placeholder="https://calendly.com/stan/primera-reunion"
           />
         </div>
       </Family>

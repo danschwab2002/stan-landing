@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { s } from "../style";
 import { ArrowRight, ChevronDown, PlayCircle, Close } from "../icons";
+import { openCalendly } from "../calendly";
 import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, type Caso, type Discipline } from "@/lib/landing-data";
 import type { SiteSettings } from "@/lib/data/settings";
 
@@ -232,10 +233,11 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
 
       {/* 04 · CONTACTO */}
       <section ref={contactRef} style={s("position:relative;background:#0d0d0d;padding:44px 22px 40px")}>
-        {/* Agendamiento embebido (Calendly, editable desde el CMS). Fallback al
-            placeholder si Adriano todavía no cargó el código. */}
-        {settings.calendlyEmbed ? (
-          <div className="calendly-embed" style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#fff;margin-bottom:28px")} dangerouslySetInnerHTML={{ __html: settings.calendlyEmbed }} />
+        {/* Imagen de marca (hardcoded, no editable). Vacía → placeholder gris. */}
+        {SITE.contact.image ? (
+          <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;margin-bottom:28px")}>
+            <img src={SITE.contact.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+          </div>
         ) : (
           <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#1a1a1a;margin-bottom:28px")} />
         )}
@@ -244,9 +246,17 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
           <br />
           {SITE.contact.title[1]}
         </h2>
-        <p style={s("margin:0 0 32px;font-size:19px;line-height:1.34;font-weight:700;color:#f5f3ec")}>
+        <p style={s("margin:0 0 24px;font-size:19px;line-height:1.34;font-weight:700;color:#f5f3ec")}>
           Contanos tu idea. Nosotros <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:3px")}>la llevamos a otro nivel.</span>
         </p>
+        {/* CTA de agendamiento: abre Calendly en popup flotante. */}
+        <button
+          onClick={() => (settings.calendlyUrl ? void openCalendly(settings.calendlyUrl) : go("contact"))}
+          style={s("display:inline-flex;align-items:center;gap:12px;margin-bottom:32px;background:var(--stan-acid);color:#0d0d0d;border:none;padding:15px 26px;border-radius:999px;font-family:var(--font-grotesk);font-weight:900;font-size:15px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer")}
+        >
+          Agendá una llamada
+          <ArrowRight width={40} height={11} strokeWidth={2} />
+        </button>
 
         <div style={s("display:flex;flex-direction:column")}>
           {[
@@ -279,7 +289,7 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
 
       {/* CTA FIJA */}
       <div style={s("position:fixed;left:0;right:0;bottom:0;z-index:40;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(13,13,13,0) 0%,rgba(13,13,13,0.9) 34%,#0d0d0d 100%)")}>
-        <button onClick={() => go("contact")} style={s("width:100%;min-height:54px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--stan-acid);color:#0d0d0d;border:none;border-radius:999px;font-family:var(--font-grotesk);font-weight:900;font-size:16px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 26px -10px rgba(0,0,0,0.8)")}>
+        <button onClick={() => (settings.calendlyUrl ? void openCalendly(settings.calendlyUrl) : go("contact"))} style={s("width:100%;min-height:54px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--stan-acid);color:#0d0d0d;border:none;border-radius:999px;font-family:var(--font-grotesk);font-weight:900;font-size:16px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 26px -10px rgba(0,0,0,0.8)")}>
           Trabajemos juntos
           <ArrowRight width={42} height={11} strokeWidth={2} />
         </button>

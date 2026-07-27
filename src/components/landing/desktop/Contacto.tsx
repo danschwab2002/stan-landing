@@ -1,27 +1,25 @@
 import { s } from "../style";
 import { ArrowRight } from "../icons";
+import { CalendlyButton } from "../calendly";
 import { SITE } from "@/lib/landing-data";
 
 const FIELD_LABEL = "font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.55);margin-bottom:10px";
 const FIELD_VALUE = "font-size:clamp(14px,1.1vw,17px);color:#f5f3ec;text-decoration:none";
 const FIELD_BOX = "padding-top:14px;border-top:1px solid rgba(245,243,236,0.16)";
 
-export function Contacto({ whatsappUrl, calendlyEmbed }: { whatsappUrl: string; calendlyEmbed: string }) {
+export function Contacto({ whatsappUrl, calendlyUrl }: { whatsappUrl: string; calendlyUrl: string }) {
   const c = SITE.contact;
   return (
     <>
       <section id="contact" style={s("position:relative;background:#0d0d0d;color:#f5f3ec;min-height:100svh;overflow:hidden;padding:clamp(44px,5vw,80px) clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center")}>
         <div style={s("max-width:1500px;margin:0 auto;width:100%")}>
           <div style={s("display:grid;grid-template-columns:minmax(260px,0.85fr) 1.5fr;gap:clamp(20px,2.6vw,52px);align-items:center")}>
-            {/* Agendamiento embebido (Calendly, editable desde el CMS). El HTML lo
-                pega Adriano en el panel → dueño del sitio, embed confiable. Si no
-                hay código cargado, se muestra el placeholder de siempre. */}
-            {calendlyEmbed ? (
-              <div
-                className="calendly-embed"
-                style={s("border-radius:clamp(16px,2vw,30px);overflow:hidden;aspect-ratio:4/5;background:#fff")}
-                dangerouslySetInnerHTML={{ __html: calendlyEmbed }}
-              />
+            {/* Imagen de marca (hardcoded, no editable desde el CMS). Vacía →
+                placeholder gris hasta que llegue la definitiva de Adriano. */}
+            {c.image ? (
+              <div style={s("border-radius:clamp(16px,2vw,30px);overflow:hidden;aspect-ratio:4/5")}>
+                <img src={c.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+              </div>
             ) : (
               <div style={s("border-radius:clamp(16px,2vw,30px);overflow:hidden;aspect-ratio:4/5;background:#1a1a1a")} />
             )}
@@ -33,14 +31,24 @@ export function Contacto({ whatsappUrl, calendlyEmbed }: { whatsappUrl: string; 
                   <br />
                   {c.title[1]}
                 </h2>
-                <p style={s("max-width:210px;margin-top:clamp(6px,1vw,16px);font-size:clamp(14px,1.15vw,18px);line-height:1.34;font-weight:700;color:#f5f3ec")}>
-                  Contanos tu idea. Nosotros{" "}
-                  <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:3px")}>la llevamos a otro nivel.</span>
-                </p>
+                <div style={s("display:flex;flex-direction:column;gap:clamp(14px,1.6vw,22px);margin-top:clamp(6px,1vw,16px)")}>
+                  <p style={s("max-width:210px;font-size:clamp(14px,1.15vw,18px);line-height:1.34;font-weight:700;color:#f5f3ec")}>
+                    Contanos tu idea. Nosotros{" "}
+                    <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:3px")}>la llevamos a otro nivel.</span>
+                  </p>
+                  {/* CTA principal de agendamiento: abre Calendly en popup flotante. */}
+                  <CalendlyButton
+                    url={calendlyUrl}
+                    style={s("display:inline-flex;align-items:center;gap:12px;align-self:flex-start;background:var(--stan-acid);color:#0d0d0d;padding:clamp(12px,1.1vw,16px) clamp(20px,1.8vw,30px);border-radius:999px;font-weight:900;font-size:clamp(13px,1vw,15px);letter-spacing:0.06em;text-transform:uppercase;text-decoration:none")}
+                  >
+                    Agendá una llamada
+                    <ArrowRight width={40} height={11} strokeWidth={2} />
+                  </CalendlyButton>
+                </div>
               </div>
 
               {/* Puntos de contacto: solo WhatsApp (Adriano, 22/07); el agendamiento
-                  es el Calendly embebido a la izquierda. Instagram + Ubicación quedan
+                  es el botón de Calendly de arriba. Instagram + Ubicación quedan
                   como contexto de marca, no como vías de contacto. */}
               <div style={s("margin-top:clamp(28px,4vw,66px);display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.2vw,42px);max-width:660px")}>
                 <div style={s(FIELD_BOX)}>

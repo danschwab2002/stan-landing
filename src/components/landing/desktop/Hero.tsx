@@ -1,8 +1,9 @@
 import { s } from "../style";
 import { ArrowRight, ChevronDown, PlayCircle } from "../icons";
+import { CalendlyButton } from "../calendly";
 import { SITE } from "@/lib/landing-data";
 
-export function Hero() {
+export function Hero({ calendlyUrl }: { calendlyUrl: string }) {
   return (
     <section id="hero" style={s("position:relative;min-height:100svh;overflow:hidden;background:#0d0d0d;color:#f5f3ec")}>
       {/* Fondo */}
@@ -21,9 +22,9 @@ export function Hero() {
             </a>
           ))}
         </nav>
-        <a className="stan-buildlink" href="#contact">
+        <CalendlyButton url={calendlyUrl} className="stan-buildlink">
           Let’s build something
-        </a>
+        </CalendlyButton>
       </header>
 
       {/* Tag colgante */}
