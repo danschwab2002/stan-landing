@@ -31,15 +31,16 @@ export function Contacto({ whatsappUrl, calendlyUrl }: { whatsappUrl: string; ca
                   <br />
                   {c.title[1]}
                 </h2>
-                <div style={s("display:flex;flex-direction:column;gap:clamp(14px,1.6vw,22px);margin-top:clamp(6px,1vw,16px)")}>
+                <div style={s("display:flex;flex-wrap:wrap;align-items:center;gap:clamp(16px,2vw,34px);margin-top:clamp(6px,1vw,16px)")}>
                   <p style={s("max-width:210px;font-size:clamp(14px,1.15vw,18px);line-height:1.34;font-weight:700;color:#f5f3ec")}>
                     Contanos tu idea. Nosotros{" "}
                     <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:3px")}>la llevamos a otro nivel.</span>
                   </p>
-                  {/* CTA principal de agendamiento: abre Calendly en popup flotante. */}
+                  {/* CTA principal de agendamiento: abre Calendly en popup flotante.
+                      A la derecha del texto, a la misma altura (feedback Dan 24/07). */}
                   <CalendlyButton
                     url={calendlyUrl}
-                    style={s("display:inline-flex;align-items:center;gap:12px;align-self:flex-start;background:var(--stan-acid);color:#0d0d0d;padding:clamp(12px,1.1vw,16px) clamp(20px,1.8vw,30px);border-radius:999px;font-weight:900;font-size:clamp(13px,1vw,15px);letter-spacing:0.06em;text-transform:uppercase;text-decoration:none")}
+                    style={s("display:inline-flex;align-items:center;gap:12px;background:var(--stan-acid);color:#0d0d0d;padding:clamp(12px,1.1vw,16px) clamp(20px,1.8vw,30px);border-radius:999px;font-weight:900;font-size:clamp(13px,1vw,15px);letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;white-space:nowrap")}
                   >
                     Agendá una llamada
                     <ArrowRight width={40} height={11} strokeWidth={2} />
