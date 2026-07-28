@@ -45,3 +45,6 @@ next-env.d.ts
 stan.db
 stan.db-*
 *.db
+
+# imágenes subidas desde el CMS en dev (en prod viven en el volumen /data)
+/.uploads/

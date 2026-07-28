@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { saveDiscipline } from "@/app/admin/actions";
+import { ImageField } from "@/components/admin/ImageField";
 import type { DisciplineRow } from "@/lib/db/schema";
 
 const inputCls =
@@ -54,54 +55,32 @@ export function DisciplineForm({ discipline: d }: { discipline?: DisciplineRow }
           <label className={labelCls}>Título *</label>
           <input name="title" required defaultValue={d?.title ?? ""} className={inputCls} />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={labelCls}>Key (slug estable)</label>
-            <input
-              name="key"
-              defaultValue={d?.key ?? ""}
-              className={inputCls}
-              placeholder="content"
-            />
-            <p className="mt-1 text-xs text-black/40">
-              Identificador interno del vínculo con los casos. Si lo dejás vacío, se genera
-              del título. Cambiarlo desvincula los proyectos ya asignados.
-            </p>
-          </div>
-          <div>
-            <label className={labelCls}>Ícono (URL)</label>
-            <input
-              name="icon"
-              defaultValue={d?.icon ?? ""}
-              className={inputCls}
-              placeholder="/assets/imagery/ic-contenido.png"
-            />
-          </div>
-        </div>
-        {d?.icon ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={d.icon} alt="Ícono actual" className="h-9 w-auto" />
-        ) : null}
         <div>
-          <label className={labelCls}>Imagen del área (URL)</label>
+          <label className={labelCls}>Key (slug estable)</label>
           <input
-            name="image"
-            defaultValue={d?.image ?? ""}
+            name="key"
+            defaultValue={d?.key ?? ""}
             className={inputCls}
-            placeholder="https://static.wixstatic.com/…  ó  /assets/imagery/…"
+            placeholder="content"
           />
           <p className="mt-1 text-xs text-black/40">
-            La imagen grande del recuadro del área en “Qué hacemos”. Si la dejás vacía, queda el recuadro gris.
+            Identificador interno del vínculo con los casos. Si lo dejás vacío, se genera
+            del título. Cambiarlo desvincula los proyectos ya asignados.
           </p>
-          {d?.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={d.image}
-              alt="Imagen actual"
-              className="mt-2 aspect-[16/11] w-56 rounded-lg object-cover"
-            />
-          ) : null}
         </div>
+        <ImageField
+          name="icon"
+          label="Ícono"
+          defaultValue={d?.icon}
+          hint="El ícono chico que acompaña al título del área."
+          previewClass="mt-2 h-9 w-auto"
+        />
+        <ImageField
+          name="image"
+          label="Imagen del área"
+          defaultValue={d?.image}
+          hint="La imagen grande del recuadro del área en “Qué hacemos”. Si la dejás vacía, queda el recuadro gris."
+        />
         <div>
           <label className={labelCls}>Descripción</label>
           <textarea

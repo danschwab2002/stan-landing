@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { saveProject } from "@/app/admin/actions";
+import { ImageField } from "@/components/admin/ImageField";
 import type { DisciplineRow, Project } from "@/lib/db/schema";
 
 const inputCls =
@@ -106,20 +107,15 @@ export function ProjectForm({
       <Family
         n="2"
         title="Recursos / media"
-        hint="Por ahora se cargan por URL (imagen /seed/… o link externo). El upload de archivos a Storage se suma en producción."
+        hint="La portada se sube desde la compu (se optimiza sola) o se pega como URL. El video va siempre por link."
       >
-        <div>
-          <label className={labelCls}>Portada (URL)</label>
-          <input name="coverUrl" defaultValue={p?.coverUrl ?? ""} className={inputCls} />
-          {p?.coverUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={p.coverUrl}
-              alt="Portada actual"
-              className="mt-2 h-28 w-20 rounded-lg object-cover"
-            />
-          )}
-        </div>
+        <ImageField
+          name="coverUrl"
+          label="Portada"
+          defaultValue={p?.coverUrl}
+          hint="Es la imagen de la tarjeta del caso y del encabezado del detalle. Vertical, se recorta a 3:4."
+          previewClass="mt-2 h-28 w-20 rounded-lg object-cover"
+        />
         <div>
           <label className={labelCls}>Video (Vimeo / YouTube / Storage)</label>
           <input name="videoUrl" defaultValue={p?.videoUrl ?? ""} className={inputCls} />

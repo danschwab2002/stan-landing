@@ -18,6 +18,7 @@ import {
 } from "@/lib/data/disciplines";
 import { setSiteSettings } from "@/lib/data/settings";
 import { requireAuth } from "@/lib/auth-server";
+import { isInternalAssetPath } from "@/lib/uploads";
 
 function str(v: FormDataEntryValue | null): string {
   return (v ?? "").toString().trim();
@@ -31,6 +32,17 @@ function httpUrl(v: string): string {
   } catch {
     return "";
   }
+}
+
+/**
+ * Igual que `httpUrl` pero para campos de imagen, que además aceptan rutas internas
+ * (`/uploads/…` de una subida, `/assets/…` del repo). `httpUrl` solo las rechazaría:
+ * `new URL("/uploads/x.webp")` tira porque no es absoluta — sin esto, toda imagen
+ * subida se guardaría como cadena vacía.
+ */
+function assetUrl(v: string): string {
+  if (!v) return "";
+  return isInternalAssetPath(v) ? v : httpUrl(v);
 }
 function bool(v: FormDataEntryValue | null): boolean {
   const s = str(v).toLowerCase();
@@ -90,7 +102,7 @@ export async function saveProject(formData: FormData) {
     shortDesc: str(formData.get("shortDesc")),
     longDesc: str(formData.get("longDesc")),
     credits: str(formData.get("credits")),
-    coverUrl: httpUrl(str(formData.get("coverUrl"))),
+    coverUrl: assetUrl(str(formData.get("coverUrl"))),
     videoUrl: httpUrl(str(formData.get("videoUrl"))),
     slug: str(formData.get("slug")) || slugify(title),
     published: bool(formData.get("published")),
@@ -149,8 +161,8 @@ export async function saveDiscipline(formData: FormData) {
   const data = {
     key: str(formData.get("key")) || slugify(title),
     title,
-    icon: str(formData.get("icon")),
-    image: httpUrl(str(formData.get("image"))),
+    icon: assetUrl(str(formData.get("icon"))),
+    image: assetUrl(str(formData.get("image"))),
     description: str(formData.get("description")),
     items: JSON.stringify(lines(formData.get("items"))),
     detail: JSON.stringify(parseDetail(formData.get("detail"))),
