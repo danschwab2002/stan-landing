@@ -233,7 +233,7 @@ export const SITE = {
     calendly: "", // TODO: URL de Calendly a definir con Adriano (semilla del CMS)
     // Imagen del recuadro de la sección Contacto ("Let's build something").
     // HARDCODED a propósito (no editable desde el CMS). Vacío → placeholder gris.
-    image: "", // TODO: imagen definitiva (pendiente de Adriano)
+    image: "/assets/imagery/contacto-build.webp", // definitiva, la pasó Adriano el 28/07
     location: "Buenos Aires, Argentina",
   },
   footer: {
