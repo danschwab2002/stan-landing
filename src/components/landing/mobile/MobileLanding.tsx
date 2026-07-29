@@ -85,7 +85,7 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
             <br />
             <span style={{ fontStyle: "italic" }}>Ideas complejas.</span>
             <br />
-            <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px")}>Ideas imposibles.</span>
+            <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px")}>Ideas <span style={s("text-decoration:line-through;text-decoration-color:var(--stan-acid);text-decoration-thickness:3px")}>im</span>posibles.</span>
           </h1>
           <p style={s("font-size:17px;line-height:1.5;font-weight:400;color:rgba(245,243,236,0.94);margin:0 0 22px;max-width:330px")}>
             Las transformamos en <span style={s("text-decoration:underline;text-underline-offset:3px")}>experiencias, contenidos</span> y <span style={s("text-decoration:underline;text-underline-offset:3px")}>producciones</span> que <span style={{ fontWeight: 700 }}>generan impacto.</span>

@@ -44,8 +44,16 @@ export function Hero({ calendlyUrl }: { calendlyUrl: string }) {
             <br />
             <span style={{ fontStyle: "italic" }}>Ideas complejas.</span>
             <br />
+            {/* "im" tachado en amarillo (pedido de Adriano 29/07): la frase se lee
+                "Ideas posibles". El subrayado del padre se propaga al hijo, pero
+                `text-decoration-color` solo pinta la decoración PROPIA -> el
+                subrayado queda blanco y el tachado sale ácido. */}
             <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px")}>
-              Ideas imposibles.
+              Ideas{" "}
+              <span style={s("text-decoration:line-through;text-decoration-color:var(--stan-acid);text-decoration-thickness:2px")}>
+                im
+              </span>
+              posibles.
             </span>
           </h1>
           <div style={s("max-width:320px;min-width:220px;display:flex;flex-direction:column;gap:clamp(16px,2vw,26px)")}>
