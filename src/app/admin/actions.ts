@@ -64,11 +64,29 @@ function lines(v: FormDataEntryValue | null): string[] {
     .filter(Boolean);
 }
 /** Textarea "Título :: descripción" por línea → [{ title, desc }]. */
-function parseDetail(v: FormDataEntryValue | null): { title: string; desc: string }[] {
-  return lines(v).map((l) => {
-    const [title, ...rest] = l.split("::");
-    return { title: title.trim(), desc: rest.join("::").trim() };
-  });
+/**
+ * Tarjetas del detalle de un área. El editor (`DetailCardsEditor`) emite tres
+ * campos repetidos con el mismo nombre, uno por tarjeta; acá se cruzan por índice.
+ * Los arrays llegan alineados porque `getAll()` respeta el orden del DOM y una
+ * tarjeta sin imagen igual emite su campo vacío.
+ *
+ * Se descartan las tarjetas sin título: son las filas que el usuario agregó y
+ * dejó en blanco. La imagen pasa por `assetUrl` — mismo saneamiento que el resto
+ * de los campos de imagen (acepta `/uploads/…` y `/assets/…`, descarta el resto
+ * que no sea http(s)).
+ */
+function parseDetail(formData: FormData): { title: string; desc: string; image: string }[] {
+  const titles = formData.getAll("detailTitle");
+  const descs = formData.getAll("detailDesc");
+  const images = formData.getAll("detailImage");
+
+  return titles
+    .map((t, i) => ({
+      title: str(t),
+      desc: str(descs[i] ?? ""),
+      image: assetUrl(str(images[i] ?? "")),
+    }))
+    .filter((c) => c.title !== "");
 }
 /** IDs de disciplinas tildadas en el multi-select. */
 function ids(formData: FormData, name: string): number[] {
@@ -165,7 +183,7 @@ export async function saveDiscipline(formData: FormData) {
     image: assetUrl(str(formData.get("image"))),
     description: str(formData.get("description")),
     items: JSON.stringify(lines(formData.get("items"))),
-    detail: JSON.stringify(parseDetail(formData.get("detail"))),
+    detail: JSON.stringify(parseDetail(formData)),
     published: bool(formData.get("published")),
     sortOrder: Number(str(formData.get("sortOrder")) || "0"),
   };

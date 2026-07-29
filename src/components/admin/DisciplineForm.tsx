@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { saveDiscipline } from "@/app/admin/actions";
+import { DetailCardsEditor, type DetailCard } from "@/components/admin/DetailCardsEditor";
 import { ImageField } from "@/components/admin/ImageField";
 import type { DisciplineRow } from "@/lib/db/schema";
 
@@ -41,9 +42,9 @@ function parseArr<T>(raw: string | null | undefined, fallback: T): T {
 
 export function DisciplineForm({ discipline: d }: { discipline?: DisciplineRow }) {
   const itemsText = parseArr<string[]>(d?.items, []).join("\n");
-  const detailText = parseArr<{ title: string; desc: string }[]>(d?.detail, [])
-    .map((it) => `${it.title} :: ${it.desc}`)
-    .join("\n");
+  // Las tarjetas guardadas antes de que existiera `image` llegan sin ese campo:
+  // el editor las toma igual y quedan con el recuadro gris hasta que se les cargue una.
+  const detailCards = parseArr<DetailCard[]>(d?.detail, []);
 
   return (
     <form action={saveDiscipline} className="grid gap-6">
@@ -107,19 +108,13 @@ export function DisciplineForm({ discipline: d }: { discipline?: DisciplineRow }
         />
       </Family>
 
-      {/* 3 · Detalle del overlay */}
+      {/* 3 · Tarjetas del área */}
       <Family
         n="3"
-        title="Detalle del overlay"
-        hint="Opcional. Una tarjeta por línea con el formato «Título :: descripción». Es el bloque ampliado que se ve al abrir el área. Dejalo vacío si el área no tiene detalle."
+        title="Tarjetas del área"
+        hint="La página que se abre al clickear “Ver área”. Cada tarjeta lleva su título, su imagen y una descripción corta; se numeran solas en el orden de acá. Sin tarjetas, el área no muestra ese botón (salvo que tenga casos asociados)."
       >
-        <textarea
-          name="detail"
-          rows={5}
-          defaultValue={detailText}
-          className={inputCls}
-          placeholder={"Estrategia :: Definimos el norte editorial.\nProducción :: Rodamos y editamos las piezas."}
-        />
+        <DetailCardsEditor initial={detailCards} />
       </Family>
 
       {/* 4 · Publicación & orden */}

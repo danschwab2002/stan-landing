@@ -47,10 +47,14 @@ export function DisciplinaOverlay({
         {detail.length > 0 ? (
           <div style={s("display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,2.6vw,50px)")}>
             {detail.map((item, i) => (
-              <div key={item.title} style={s("display:flex;flex-direction:column")}>
+              <div key={`${i}-${item.title}`} style={s("display:flex;flex-direction:column")}>
                 <span style={s("font-weight:700;font-size:12px;letter-spacing:0.02em;color:var(--stan-acid);margin-bottom:12px")}>{`0${i + 1}.`}</span>
                 <h3 style={s("margin:0 0 22px;font-family:var(--font-grotesk);font-weight:700;font-size:clamp(16px,1.35vw,21px);letter-spacing:0.005em;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
-                <div style={s("border-radius:clamp(9px,1vw,14px);overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;margin-bottom:20px")} />
+                <div style={s("border-radius:clamp(9px,1vw,14px);overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;margin-bottom:20px")}>
+                  {item.image ? (
+                    <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                  ) : null}
+                </div>
                 <p style={s("font-size:13px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
               </div>
             ))}

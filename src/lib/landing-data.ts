@@ -34,7 +34,12 @@ export type Caso = {
   recommended?: string[];
 };
 
-export type DisciplineDetailItem = { title: string; desc: string };
+/**
+ * Una tarjeta del detalle de un área (el bloque que se abre al clickear "Ver área").
+ * `image` es opcional a propósito: las tarjetas cargadas antes de que el campo
+ * existiera se siguen leyendo igual y caen al recuadro gris, sin migrar nada.
+ */
+export type DisciplineDetailItem = { title: string; desc: string; image?: string };
 
 export type Discipline = {
   key: string;
