@@ -100,6 +100,7 @@ export async function getLandingCasos(): Promise<Caso[]> {
       body: r.longDesc ?? "",
       services: DEFAULT_SERVICES,
       recommended,
+      video: r.videoUrl || undefined,
     } satisfies Caso;
   });
 }

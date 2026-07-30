@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { s } from "../style";
 import { ArrowRight, ChevronDown, PlayCircle, Close } from "../icons";
 import { openCalendly } from "../calendly";
-import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, type Caso, type Discipline } from "@/lib/landing-data";
+import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
 import type { SiteSettings } from "@/lib/data/settings";
 
 type SectionKey = "hero" | "work" | "casos" | "manifesto" | "contact";
@@ -52,7 +52,7 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
     : [];
   // Disciplina abierta + sus casos (navegación cruzada área → casos, G11)
   const disc = discIdx >= 0 ? disciplines[discIdx] : undefined;
-  const discCasos = disc ? casosByDiscipline(disc.key, casos) : [];
+  const discCasos = disc ? casosByDiscipline(disc.key, casos, MAX_CASOS_AREA) : [];
 
   return (
     <div style={s("position:relative;background:#0d0d0d;color:#f5f3ec;font-family:var(--font-grotesk);overflow-x:hidden")}>
@@ -371,10 +371,13 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
               </div>
             ) : null}
 
+            {/* Casos destacados del área — el banner del desktop traducido a una columna:
+                media ancha con el play y el texto debajo (BB Factor 29/07). Apilar tag +
+                título + bajada SOBRE la imagen la dejaba ilegible en pantalla chica. */}
             {discCasos.length > 0 ? (
               <>
-                <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:16px")}>Casos de {disc.title}</div>
-                <div style={s("display:flex;flex-direction:column;gap:14px")}>
+                <div style={s("font-weight:500;font-size:18px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper);margin-bottom:18px")}>Casos destacados</div>
+                <div style={s("display:flex;flex-direction:column;gap:26px")}>
                   {discCasos.map((c) => {
                     const ci = casos.findIndex((x) => x.key === c.key);
                     return (
@@ -383,16 +386,21 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
                         onClick={() => { setDiscIdx(-1); setOpenIdx(ci); }}
                         style={s("display:block;width:100%;text-align:left;padding:0;border:none;background:none;cursor:pointer")}
                       >
-                        <div style={s("position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#1a1a1a")}>
+                        <div style={s("position:relative;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a;margin-bottom:14px")}>
                           {c.cover ? (
                             <img src={c.cover} alt={c.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
                           ) : null}
-                          <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 44%,rgba(13,13,13,0.9) 100%)")} />
-                          <div style={s("position:absolute;left:0;right:0;bottom:0;padding:16px")}>
-                            <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:6px")}>{c.tag}</div>
-                            <h4 style={s("margin:0;font-family:var(--font-grotesk);font-weight:500;font-size:24px;line-height:1;text-transform:uppercase;color:#f5f3ec")}>{c.title}</h4>
+                          <div style={s("position:absolute;inset:0;display:flex;align-items:center;justify-content:center")}>
+                            <span style={s("display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:999px;background:rgba(13,13,13,0.34)")}>
+                              <PlayCircle width={28} height={28} stroke="#f5f3ec" strokeWidth={1.2} />
+                            </span>
                           </div>
                         </div>
+                        <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:8px")}>{c.tag}</div>
+                        <h4 style={s("margin:0 0 10px;font-family:var(--font-grotesk);font-weight:500;font-size:24px;line-height:1.05;text-transform:uppercase;color:#f5f3ec")}>{c.title}</h4>
+                        {c.lead ? (
+                          <p style={s("margin:0;font-size:13px;line-height:1.5;color:rgba(245,243,236,0.72);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden")}>{c.lead}</p>
+                        ) : null}
                       </button>
                     );
                   })}

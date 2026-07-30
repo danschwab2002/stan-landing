@@ -1,7 +1,7 @@
 import { s } from "../style";
-import { ArrowLeft } from "../icons";
+import { ArrowLeft, PlayCircle } from "../icons";
 import { Marquee } from "./Marquee";
-import { casosByDiscipline, type Caso, type Discipline } from "@/lib/landing-data";
+import { casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
 
 export function DisciplinaOverlay({
   discipline,
@@ -15,7 +15,7 @@ export function DisciplinaOverlay({
   onClose: () => void;
 }) {
   const detail = discipline.detail ?? [];
-  const casos = casosByDiscipline(discipline.key, allCasos); // navegación cruzada área → sus casos (G11)
+  const casos = casosByDiscipline(discipline.key, allCasos, MAX_CASOS_AREA); // área → sus casos (G11), 2-3 según BB Factor
   return (
     <div style={s("position:fixed;inset:0;z-index:70;background:#0d0d0d;color:#f5f3ec;overflow:auto;font-family:var(--font-grotesk);display:flex;flex-direction:column")}>
       <header style={s("display:flex;align-items:center;justify-content:space-between;gap:20px;padding:clamp(20px,2.6vw,36px) clamp(24px,5vw,64px)")}>
@@ -61,32 +61,50 @@ export function DisciplinaOverlay({
           </div>
         ) : null}
 
-        {/* Casos del área — navegación cruzada disciplina → casos (feedback Adriano 20/07, G11) */}
+        {/* Casos destacados del área — banners largos de punta a punta (BB Factor 29/07).
+            Nace del G11 (feedback Adriano 20/07, área → sus casos) y se reformatea al
+            mockup de Bianca: menos detalle que el caso del Home, el video del producto
+            final al frente y todo resuelto acá, sin mandar a ninguna sección nueva. */}
         {casos.length > 0 ? (
-          <div style={s(`margin-top:${detail.length > 0 ? "clamp(48px,6vw,96px)" : "clamp(8px,1vw,20px)"}`)}>
-            <div style={s("display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(20px,2.4vw,36px)")}>
-              <span style={s("font-family:var(--font-grotesk);font-weight:700;font-size:12px;letter-spacing:0.04em;color:var(--stan-acid)")}>Casos</span>
-              <span style={s("font-weight:500;font-size:clamp(14px,1.2vw,18px);color:rgba(245,243,236,0.7)")}>Proyectos de {discipline.title}</span>
+          <>
+            {/* Marquee separador — full-bleed: cancela el padding lateral del contenedor */}
+            <div style={s(`margin:${detail.length > 0 ? "clamp(48px,6vw,96px)" : "clamp(20px,2.4vw,40px)"} calc(clamp(24px,5vw,64px) * -1) clamp(36px,4.4vw,72px)`)}>
+              <Marquee />
             </div>
-            <div style={s("display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(12px,1.4vw,22px)")}>
-              {casos.map((c) => (
+
+            <h3 style={s("margin:0 0 clamp(24px,3vw,48px);font-family:var(--font-grotesk);font-weight:500;font-size:clamp(20px,2vw,32px);letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper)")}>
+              Casos destacados
+            </h3>
+
+            <div>
+              {casos.map((c, i) => (
                 <div
                   key={c.key}
                   onClick={() => onOpenCaso(c.key)}
-                  style={s("position:relative;overflow:hidden;border-radius:clamp(12px,1.2vw,18px);background:#1a1a1a;aspect-ratio:4/5;cursor:pointer")}
+                  style={s(`display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,2fr);gap:clamp(24px,3.4vw,64px);align-items:center;cursor:pointer;padding:clamp(22px,2.8vw,44px) 0${i > 0 ? ";border-top:1px solid rgba(245,243,236,0.16)" : ""}`)}
                 >
-                  {c.cover ? (
-                    <img src={c.cover} alt={c.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
-                  ) : null}
-                  <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 42%,rgba(13,13,13,0.9) 100%)")} />
-                  <div style={s("position:absolute;left:0;right:0;bottom:0;padding:clamp(14px,1.2vw,20px)")}>
-                    <div style={s("font-weight:700;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:6px")}>{c.tag}</div>
-                    <h4 style={s("margin:0;font-family:var(--font-grotesk);font-weight:500;font-size:clamp(17px,1.5vw,22px);line-height:1;text-transform:uppercase;color:#f5f3ec")}>{c.title}</h4>
+                  <div>
+                    <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:10px")}>{c.tag}</div>
+                    <h4 style={s("margin:0 0 14px;font-family:var(--font-grotesk);font-weight:500;font-size:clamp(19px,1.9vw,29px);line-height:1.05;text-transform:uppercase;color:#f5f3ec")}>{c.title}</h4>
+                    {c.lead ? (
+                      <p style={s("margin:0;font-size:13px;line-height:1.5;color:rgba(245,243,236,0.72);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden")}>{c.lead}</p>
+                    ) : null}
+                  </div>
+
+                  <div style={s("position:relative;aspect-ratio:12/5;background:#1a1a1a;overflow:hidden")}>
+                    {c.cover ? (
+                      <img src={c.cover} alt={c.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
+                    ) : null}
+                    <div style={s("position:absolute;inset:0;display:flex;align-items:center;justify-content:center")}>
+                      <span style={s("display:inline-flex;align-items:center;justify-content:center;width:clamp(44px,4vw,60px);height:clamp(44px,4vw,60px);border-radius:999px;background:rgba(13,13,13,0.34);backdrop-filter:blur(2px)")}>
+                        <PlayCircle width={30} height={30} stroke="#f5f3ec" strokeWidth={1.2} />
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </>
         ) : null}
       </div>
 

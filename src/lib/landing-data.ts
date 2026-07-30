@@ -32,6 +32,10 @@ export type Caso = {
   /** Keys de los casos recomendados al pie ("Otros proyectos", rabbit-hole).
    *  Manual desde el CMS o, si no hay asignados, un set al azar (Adriano 22/07). */
   recommended?: string[];
+  /** Video del producto final (Vimeo/YouTube/storage). Vive en la DB desde
+   *  siempre; se expone al landing para el banner de casos de la subpágina de
+   *  área (BB Factor 29/07). Vacío = el banner va con la portada y sin play. */
+  video?: string;
 };
 
 /**
@@ -131,9 +135,16 @@ export const disciplineTitle = (key: string, disciplines: Discipline[]): string 
   disciplines.find((d) => d.key === key)?.title ?? key;
 
 /** Casos que pertenecen a un área/disciplina — "abrí un área → ves sus casos". */
-export function casosByDiscipline(key: string, casos: Caso[]): Caso[] {
-  return casos.filter((c) => (c.disciplines ?? []).includes(key));
+export function casosByDiscipline(key: string, casos: Caso[], limit?: number): Caso[] {
+  const found = casos.filter((c) => (c.disciplines ?? []).includes(key));
+  return limit === undefined ? found : found.slice(0, limit);
 }
+
+/** Cuántos casos destacados muestra la subpágina de un área. Bianca (BB Factor,
+ *  29/07): "ahí ponemos como barridas de dos o tres casos destacados". El tope
+ *  aplica solo al render — `casosByDiscipline` sin `limit` sigue devolviendo
+ *  todos, que es lo que necesita el cálculo de "el área es clickeable". */
+export const MAX_CASOS_AREA = 3;
 
 /** Caso relacionado para el rabbit-hole: el siguiente caso que comparte al
  *  menos un área; si ninguno comparte, el siguiente en orden. */
