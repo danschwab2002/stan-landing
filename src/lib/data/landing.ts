@@ -22,14 +22,40 @@ function pickRandom<T>(arr: T[], n: number): T[] {
  * join M2M (G11) y sus casos recomendados (rabbit-hole: manual desde el CMS o,
  * si no hay asignados, un set al azar — decisión Adriano 22/07). Reemplaza al
  * `CASOS` estático de landing-data.
+ *
+ * Es la grilla "Casos destacados" del Home: la vidriera curada de Stan.
  */
 export async function getLandingCasos(): Promise<Caso[]> {
+  return loadCasos(true);
+}
+
+/**
+ * Casos que alimentan las subpáginas de área: **todos los publicados**, no solo
+ * los destacados.
+ *
+ * "Destacado del Home" y "caso del área" son dos cosas distintas. El Home
+ * muestra una selección corta y curada; la subpágina del área es el catálogo de
+ * ese área. Con un único set —los 4 destacados repartidos entre 4 áreas— cada
+ * área mostraba ~1 caso, contra los "dos o tres" que definió Bianca (BB Factor,
+ * 29/07) y que el mockup ilustra. Separar las dos consultas evita el efecto
+ * colateral de la alternativa (marcar más proyectos como destacados infla
+ * también la vidriera del Home).
+ */
+export async function getAreaCasos(): Promise<Caso[]> {
+  return loadCasos(false);
+}
+
+async function loadCasos(onlyFeatured: boolean): Promise<Caso[]> {
   await ensureDb();
 
   const rows = await db
     .select()
     .from(projects)
-    .where(and(eq(projects.published, true), eq(projects.featured, true)))
+    .where(
+      onlyFeatured
+        ? and(eq(projects.published, true), eq(projects.featured, true))
+        : eq(projects.published, true)
+    )
     .orderBy(asc(projects.sortOrder), asc(projects.id));
   if (rows.length === 0) return [];
 

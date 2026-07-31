@@ -9,7 +9,13 @@ import type { SiteSettings } from "@/lib/data/settings";
 
 type SectionKey = "hero" | "work" | "casos" | "manifesto" | "contact";
 
-export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[]; disciplines: Discipline[]; settings: SiteSettings }) {
+/**
+ * `casos` = destacados (el carrusel del Home) · `areaCasos` = todos los
+ * publicados (el catálogo de cada área). Como `areaCasos` es un superset,
+ * **el bottom-sheet indexa sobre él**: un caso abierto desde un área puede no
+ * ser destacado, y un índice sobre `casos` no lo alcanzaría.
+ */
+export function MobileLanding({ casos, areaCasos, disciplines, settings }: { casos: Caso[]; areaCasos: Caso[]; disciplines: Discipline[]; settings: SiteSettings }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openIdx, setOpenIdx] = useState(-1);
   const [discIdx, setDiscIdx] = useState(-1); // overlay de disciplina (navegación cruzada, G11)
@@ -39,20 +45,22 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
 
   const sheetOpen = openIdx >= 0;
   if (sheetOpen) lastIdx.current = openIdx;
-  const current = casos[sheetOpen ? openIdx : lastIdx.current];
-  // Caso relacionado para el "siguiente proyecto" del sheet (feedback Adriano 20/07)
-  const nextCaso = current ? relatedCaso(current, casos) : undefined;
-  const nextIdx = nextCaso ? casos.findIndex((c) => c.key === nextCaso.key) : -1;
+  const current = areaCasos[sheetOpen ? openIdx : lastIdx.current];
+  // Caso relacionado para el "siguiente proyecto" del sheet (feedback Adriano 20/07).
+  // Entre los destacados si vino del Home; entre todos si se abrió desde un área.
+  const relatedPool = current && casos.some((c) => c.key === current.key) ? casos : areaCasos;
+  const nextCaso = current ? relatedCaso(current, relatedPool) : undefined;
+  const nextIdx = nextCaso ? areaCasos.findIndex((c) => c.key === nextCaso.key) : -1;
   const nextArea = nextCaso?.disciplines?.[0] ? disciplineTitle(nextCaso.disciplines[0], disciplines) : null;
   // Casos recomendados al pie (rabbit-hole: manual o random, decisión Adriano 22/07)
   const recCasos: Caso[] = current
     ? (current.recommended ?? [])
-        .map((k) => casos.find((c) => c.key === k))
+        .map((k) => areaCasos.find((c) => c.key === k))
         .filter((c): c is Caso => Boolean(c))
     : [];
   // Disciplina abierta + sus casos (navegación cruzada área → casos, G11)
   const disc = discIdx >= 0 ? disciplines[discIdx] : undefined;
-  const discCasos = disc ? casosByDiscipline(disc.key, casos, MAX_CASOS_AREA) : [];
+  const discCasos = disc ? casosByDiscipline(disc.key, areaCasos, MAX_CASOS_AREA) : [];
 
   return (
     <div style={s("position:relative;background:#0d0d0d;color:#f5f3ec;font-family:var(--font-grotesk);overflow-x:hidden")}>
@@ -125,7 +133,7 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
         <div style={s("display:flex;flex-direction:column;gap:44px")}>
           {disciplines.map((d, di) => {
             // Clickeable si tiene detalle propio o casos de esa área (G11).
-            const clickable = Boolean(d.detail) || casosByDiscipline(d.key, casos).length > 0;
+            const clickable = Boolean(d.detail) || casosByDiscipline(d.key, areaCasos).length > 0;
             return (
               <div
                 key={d.key}
@@ -165,8 +173,8 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
         <p style={s("font-size:17px;line-height:1.42;font-weight:700;margin:0 0 34px;color:#f5f3ec")}>{SITE.casos.lead}</p>
 
         <div className="hscroll" style={s("display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -22px;padding:0 22px 4px")}>
-          {casos.map((c, i) => (
-            <button key={c.key} onClick={() => setOpenIdx(i)} style={s("flex:none;width:78%;scroll-snap-align:start;display:block;text-align:left;padding:0;border:none;background:none;cursor:pointer")}>
+          {casos.map((c) => (
+            <button key={c.key} onClick={() => setOpenIdx(areaCasos.findIndex((x) => x.key === c.key))} style={s("flex:none;width:78%;scroll-snap-align:start;display:block;text-align:left;padding:0;border:none;background:none;cursor:pointer")}>
               <div style={s("position:relative;border-radius:16px;overflow:hidden;background:#1a1a1a;aspect-ratio:3/4")}>
                 <div style={s("position:absolute;inset:0")}>
                   {c.cover ? (
@@ -379,7 +387,7 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
                 <div style={s("font-weight:500;font-size:18px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper);margin-bottom:18px")}>Casos destacados</div>
                 <div style={s("display:flex;flex-direction:column;gap:26px")}>
                   {discCasos.map((c) => {
-                    const ci = casos.findIndex((x) => x.key === c.key);
+                    const ci = areaCasos.findIndex((x) => x.key === c.key);
                     return (
                       <button
                         key={c.key}
@@ -507,7 +515,7 @@ export function MobileLanding({ casos, disciplines, settings }: { casos: Caso[];
                 <div style={s("text-align:center;font-family:var(--font-grotesk);font-weight:900;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:16px")}>Otros casos destacados</div>
                 <div style={s("display:flex;flex-direction:column;gap:14px")}>
                   {recCasos.map((rc) => {
-                    const ci = casos.findIndex((x) => x.key === rc.key);
+                    const ci = areaCasos.findIndex((x) => x.key === rc.key);
                     return (
                       <button
                         key={rc.key}
