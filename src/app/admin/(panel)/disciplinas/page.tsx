@@ -34,7 +34,7 @@ export default async function DisciplinasPage() {
 
   return (
     <div>
-      <header className="mb-8 flex items-end justify-between">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-black tracking-[0.07em]">Áreas</h1>
           <p className="mt-1 text-sm text-black/50">
@@ -51,7 +51,9 @@ export default async function DisciplinasPage() {
         </Link>
       </header>
 
-      <div className="overflow-hidden rounded-xl border border-black/10 bg-[#faf9f5]">
+      {/* overflow-x-auto y no -hidden: en el celular, recortar dejaba la columna de
+          acciones fuera de alcance. */}
+      <div className="overflow-x-auto rounded-xl border border-black/10 bg-[#faf9f5]">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-black/10 text-xs uppercase tracking-wider text-black/40">

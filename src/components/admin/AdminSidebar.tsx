@@ -20,7 +20,7 @@ export function AdminSidebar() {
   const pathname = usePathname() ?? "";
 
   return (
-    <aside className="w-56 shrink-0">
+    <aside className="w-full shrink-0 sm:w-56">
       <div className="mb-8">
         <p className="font-display text-xl font-black tracking-[0.07em]">STAN</p>
         <p className="text-xs uppercase tracking-[0.2em] text-black/45">
@@ -55,6 +55,22 @@ export function AdminSidebar() {
           );
         })}
       </nav>
+
+      {/* Separado de las secciones de contenido: Ayuda no es una colección que se
+          edita, es el manual de uso del panel (decisión 31/07 — la documentación
+          vive adentro del CMS, no en una carpeta de Drive). */}
+      <div className="mt-6 border-t border-black/10 pt-4">
+        <Link
+          href="/admin/ayuda"
+          className={
+            pathname.startsWith("/admin/ayuda")
+              ? "block rounded-lg bg-[#16170f] px-3 py-2 text-sm font-semibold text-[#f5f3ec]"
+              : "block rounded-lg px-3 py-2 text-sm font-medium text-black/60 transition-colors hover:bg-black/5 hover:text-[#16170f]"
+          }
+        >
+          Ayuda
+        </Link>
+      </div>
 
       <div className="mt-8 space-y-3 border-t border-black/10 pt-4">
         <Link
