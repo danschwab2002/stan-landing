@@ -2,13 +2,26 @@ import { s } from "../style";
 import { ArrowRight } from "../icons";
 import { CalendlyButton } from "../calendly";
 import { SITE } from "@/lib/landing-data";
+import { instagramHandle } from "@/lib/instagram";
 
 const FIELD_LABEL = "font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.55);margin-bottom:10px";
 const FIELD_VALUE = "font-size:clamp(14px,1.1vw,17px);color:#f5f3ec;text-decoration:none";
 const FIELD_BOX = "padding-top:14px;border-top:1px solid rgba(245,243,236,0.16)";
 
-export function Contacto({ whatsappUrl, calendlyUrl }: { whatsappUrl: string; calendlyUrl: string }) {
+export function Contacto({
+  whatsappUrl,
+  calendlyUrl,
+  instagramUrl,
+}: {
+  whatsappUrl: string;
+  calendlyUrl: string;
+  instagramUrl: string;
+}) {
   const c = SITE.contact;
+  // El usuario visible se deriva del link cargado en el CMS: un solo dato, imposible
+  // que el texto y el link apunten a cuentas distintas. Sin link cargado el bloque no
+  // se dibuja — antes salia el usuario con `href="#"`, un link que no llevaba a nada.
+  const ig = instagramHandle(instagramUrl);
   return (
     <>
       <section id="contact" style={s("position:relative;background:#0d0d0d;color:#f5f3ec;min-height:100svh;overflow:hidden;padding:clamp(44px,5vw,80px) clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center")}>
@@ -56,10 +69,12 @@ export function Contacto({ whatsappUrl, calendlyUrl }: { whatsappUrl: string; ca
                   <div style={s(FIELD_LABEL)}>WhatsApp</div>
                   <a href={whatsappUrl || "#"} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>Escribinos</a>
                 </div>
-                <div style={s(FIELD_BOX)}>
-                  <div style={s(FIELD_LABEL)}>Instagram</div>
-                  <a href="#" style={s(FIELD_VALUE)}>{c.instagram}</a>
-                </div>
+                {ig ? (
+                  <div style={s(FIELD_BOX)}>
+                    <div style={s(FIELD_LABEL)}>Instagram</div>
+                    <a href={instagramUrl} target="_blank" rel="noopener noreferrer" style={s(FIELD_VALUE)}>{ig}</a>
+                  </div>
+                ) : null}
                 <div style={s(FIELD_BOX)}>
                   <div style={s(FIELD_LABEL)}>Ubicación</div>
                   <span style={s(FIELD_VALUE)}>{c.location}</span>

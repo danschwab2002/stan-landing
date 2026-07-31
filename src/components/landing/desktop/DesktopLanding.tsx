@@ -73,7 +73,11 @@ export function DesktopLanding({ casos, areaCasos, disciplines, settings }: { ca
       <Casos casos={casos} onOpen={openCaso} />
       <Manifesto />
       <Marquee />
-      <Contacto whatsappUrl={settings.whatsappUrl} calendlyUrl={settings.calendlyUrl} />
+      <Contacto
+        whatsappUrl={settings.whatsappUrl}
+        calendlyUrl={settings.calendlyUrl}
+        instagramUrl={settings.instagramUrl}
+      />
 
       {activeCaso ? (
         <CasoOverlay caso={activeCaso} related={relatedCaso(activeCaso, relatedPool)} recommended={recommendedCasos} disciplines={disciplines} onOpenCaso={openCaso} onOpenDisc={openDisc} onClose={closeCaso} />

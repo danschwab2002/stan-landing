@@ -13,11 +13,18 @@ export type SiteSettings = {
   whatsappUrl: string;
   /** URL del calendario de Calendly (ej. https://calendly.com/stan/…); se abre en popup flotante. */
   calendlyUrl: string;
+  /**
+   * URL canónica del perfil de Instagram (ej. https://www.instagram.com/cuenta/).
+   * Se guarda ya normalizada por `normalizeInstagram`; el usuario visible se deriva
+   * de acá, así que no hay un segundo campo que se pueda desincronizar.
+   */
+  instagramUrl: string;
 };
 
 const KEYS = {
   whatsappUrl: "whatsapp_url",
   calendlyUrl: "calendly_url",
+  instagramUrl: "instagram_url",
 } as const;
 
 export async function getSiteSettings(): Promise<SiteSettings> {
@@ -30,6 +37,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return {
     whatsappUrl: map.get(KEYS.whatsappUrl) ?? "",
     calendlyUrl: map.get(KEYS.calendlyUrl) ?? "",
+    instagramUrl: map.get(KEYS.instagramUrl) ?? "",
   };
 }
 
@@ -39,6 +47,7 @@ export async function setSiteSettings(data: SiteSettings): Promise<void> {
   const pairs: [string, string][] = [
     [KEYS.whatsappUrl, data.whatsappUrl],
     [KEYS.calendlyUrl, data.calendlyUrl],
+    [KEYS.instagramUrl, data.instagramUrl],
   ];
   for (const [key, value] of pairs) {
     await db

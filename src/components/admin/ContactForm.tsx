@@ -73,6 +73,23 @@ export function ContactForm({ settings, saved }: { settings: SiteSettings; saved
         </div>
       </Family>
 
+      {/* 3 · Instagram */}
+      <Family
+        n="3"
+        title="Instagram"
+        hint="Pegá el link de tu perfil o escribí el usuario con arroba — las dos formas funcionan. El usuario que se muestra en la sección de Contacto sale de acá, así que el texto y el link nunca pueden quedar apuntando a cuentas distintas. Si lo dejás vacío, el dato no se muestra."
+      >
+        <div>
+          <label className={labelCls}>Instagram</label>
+          <input
+            name="instagram"
+            defaultValue={settings.instagramUrl}
+            className={inputCls}
+            placeholder="@standforthevision"
+          />
+        </div>
+      </Family>
+
       <div className="flex items-center gap-4">
         <button
           type="submit"

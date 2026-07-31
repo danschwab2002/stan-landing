@@ -17,6 +17,7 @@ import {
   updateDiscipline,
 } from "@/lib/data/disciplines";
 import { setSiteSettings } from "@/lib/data/settings";
+import { normalizeInstagram } from "@/lib/instagram";
 import { requireAuth } from "@/lib/auth-server";
 import { isInternalAssetPath } from "@/lib/uploads";
 
@@ -221,6 +222,9 @@ export async function saveContact(formData: FormData) {
   await setSiteSettings({
     whatsappUrl: httpUrl(str(formData.get("whatsappUrl"))),
     calendlyUrl: httpUrl(str(formData.get("calendlyUrl"))),
+    // No pasa por httpUrl: el campo acepta tambien "@cuenta" o "instagram.com/cuenta",
+    // y normalizeInstagram reconstruye la URL desde el usuario extraido.
+    instagramUrl: normalizeInstagram(str(formData.get("instagram"))).url,
   });
   revalidatePath("/");
   revalidatePath("/admin/contacto");

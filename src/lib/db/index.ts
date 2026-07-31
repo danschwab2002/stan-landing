@@ -2,6 +2,7 @@ import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
 import { DISCIPLINES, SITE } from "@/lib/landing-data";
+import { normalizeInstagram } from "@/lib/instagram";
 import { SEED_PROJECTS } from "./seed-data";
 
 /**
@@ -181,6 +182,11 @@ async function seedSettings() {
   const defaults: Record<string, string> = {
     whatsapp_url: `https://wa.me/${SITE.contact.whatsapp}`,
     calendly_url: SITE.contact.calendly,
+    // `seedSettings` corre en cada ensureDb y el INSERT OR IGNORE solo crea la fila
+    // si falta: en la base de produccion la key todavia no existe, asi que al
+    // deployar queda cargado el usuario de marca y el link deja de ser un `href="#"`
+    // muerto sin que nadie tenga que hacer nada. Adriano lo cambia desde el panel.
+    instagram_url: normalizeInstagram(SITE.contact.instagram).url,
   };
   for (const [key, value] of Object.entries(defaults)) {
     await getClient().execute({

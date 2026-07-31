@@ -368,10 +368,16 @@ export default function AyudaPage() {
               <em>Share → Copy link</em>. El botón “Agendá una llamada” lo abre en una
               ventana flotante, sin sacar a la persona del sitio.
             </li>
+            <li>
+              <strong>Instagram</strong> — podés pegar el link del perfil o escribir el
+              usuario con arroba; las dos formas funcionan. El usuario que se muestra en la
+              sección de Contacto sale de ahí, así que el texto y el link nunca van a
+              apuntar a cuentas distintas.
+            </li>
           </ul>
           <p className="text-black/55">
             Si dejás el de Calendly vacío, el botón lleva a la sección de contacto en vez de
-            abrir el calendario.
+            abrir el calendario. Si dejás el de Instagram vacío, el dato no se muestra.
           </p>
         </Section>
 

@@ -5,6 +5,7 @@ import { s } from "../style";
 import { ArrowRight, ChevronDown, PlayCircle, Close } from "../icons";
 import { openCalendly } from "../calendly";
 import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
+import { instagramHandle } from "@/lib/instagram";
 import type { SiteSettings } from "@/lib/data/settings";
 
 type SectionKey = "hero" | "work" | "casos" | "manifesto" | "contact";
@@ -42,6 +43,8 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
+
+  const igHandle = instagramHandle(settings.instagramUrl);
 
   const sheetOpen = openIdx >= 0;
   if (sheetOpen) lastIdx.current = openIdx;
@@ -267,17 +270,19 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
         </button>
 
         <div style={s("display:flex;flex-direction:column")}>
-          {[
+          {([
             // Punto de contacto: solo WhatsApp (Adriano 22/07); agendar = Calendly
             // embebido arriba. Instagram + Ubicación quedan como contexto de marca.
             { label: "WhatsApp", value: "Escribinos", href: settings.whatsappUrl || "#" },
-            { label: "Instagram", value: SITE.contact.instagram, href: "#" },
+            // El usuario sale del link cargado en el CMS; sin link no se dibuja la
+            // fila, en vez del `href="#"` que no llevaba a ningun lado.
+            ...(igHandle ? [{ label: "Instagram", value: igHandle, href: settings.instagramUrl }] : []),
             { label: "Ubicación", value: SITE.contact.location, last: true },
-          ].map((f) => (
+          ] as { label: string; value: string; href?: string; last?: boolean }[]).map((f) => (
             <div key={f.label} style={s(`padding:18px 0;border-top:1px solid rgba(245,243,236,0.16)${f.last ? ";border-bottom:1px solid rgba(245,243,236,0.16)" : ""}`)}>
               <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.55);margin-bottom:8px")}>{f.label}</div>
               {f.href ? (
-                <a href={f.href} style={s("display:inline-flex;align-items:center;min-height:44px;font-size:18px;color:#f5f3ec;text-decoration:none")}>{f.value}</a>
+                <a href={f.href} target="_blank" rel="noopener noreferrer" style={s("display:inline-flex;align-items:center;min-height:44px;font-size:18px;color:#f5f3ec;text-decoration:none")}>{f.value}</a>
               ) : (
                 <span style={s("font-size:18px;color:#f5f3ec")}>{f.value}</span>
               )}
