@@ -360,7 +360,21 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
           <div style={s("padding:26px 22px 60px")}>
             <img src={disc.icon} alt="" style={s("display:block;height:34px;width:auto;margin-bottom:16px")} />
             <h2 style={s("margin:0 0 18px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:56px;line-height:0.9;text-transform:uppercase;color:var(--stan-paper)")}>{disc.title}</h2>
-            <p style={s("font-size:18px;line-height:1.5;font-weight:500;color:#f5f3ec;margin:0 0 30px")}>{disc.desc}</p>
+            <p style={s("font-size:18px;line-height:1.5;font-weight:500;color:#f5f3ec;margin:0 0 22px")}>{disc.desc}</p>
+
+            {/* Señal de scroll: en mobile pesa más todavía: las tarjetas de
+                sub-servicio van en una sola columna, así que los casos del área
+                quedan a varias pantallas de distancia. */}
+            {discCasos.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => document.getElementById("area-casos-mobile")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                style={s("display:inline-flex;align-items:center;gap:10px;min-height:44px;margin:0 0 22px;padding:0;background:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid)")}
+              >
+                Ver casos destacados
+                <ChevronDown className="stan-scrollhint" width={18} height={11} stroke="currentColor" strokeWidth={1.8} />
+              </button>
+            ) : null}
 
             {(disc.detail ?? []).length > 0 ? (
               <div style={s("display:flex;flex-direction:column;gap:26px;margin-bottom:36px")}>
@@ -384,7 +398,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
                 título + bajada SOBRE la imagen la dejaba ilegible en pantalla chica. */}
             {discCasos.length > 0 ? (
               <>
-                <div style={s("font-weight:500;font-size:18px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper);margin-bottom:18px")}>Casos destacados</div>
+                <div id="area-casos-mobile" style={s("font-weight:500;font-size:18px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper);margin-bottom:18px;scroll-margin-top:68px")}>Casos destacados</div>
                 <div style={s("display:flex;flex-direction:column;gap:26px")}>
                   {discCasos.map((c) => {
                     const ci = areaCasos.findIndex((x) => x.key === c.key);

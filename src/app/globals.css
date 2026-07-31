@@ -171,6 +171,14 @@ h1, h2, h3, h4, h5, h6, p { margin: 0; }
 @keyframes stan-bob    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 @keyframes stan-rotate { to { transform: rotate(360deg); } }
 
+/* Chevron del "Ver casos destacados" en la subpágina de área: el rebote es lo
+   que delata que la página sigue más abajo. Se apaga si el visitante pidió
+   menos movimiento. */
+.stan-scrollhint { animation: stan-bob 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .stan-scrollhint { animation: none; }
+}
+
 /* ---------- Utilidades del diseño ---------- */
 .stan-navlink {
   color: rgba(245,243,236,0.9); text-decoration: none;

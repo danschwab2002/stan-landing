@@ -1,7 +1,12 @@
 import { s } from "../style";
-import { ArrowLeft, PlayCircle } from "../icons";
+import { ArrowLeft, ChevronDown, PlayCircle } from "../icons";
 import { Marquee } from "./Marquee";
 import { casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
+
+/** Ancla del bloque de casos, destino del botón "Ver casos destacados".
+ *  Los árboles desktop y mobile conviven en el DOM (se alternan por media
+ *  query), así que cada uno usa su propio id. */
+const CASOS_ANCHOR = "area-casos-desktop";
 
 export function DisciplinaOverlay({
   discipline,
@@ -41,7 +46,23 @@ export function DisciplinaOverlay({
             <h2 style={s("margin:0;font-family:Bootzy,var(--font-grotesk);font-weight:400;font-size:clamp(52px,7.4vw,140px);line-height:0.82;letter-spacing:0.02em;text-transform:uppercase;color:var(--stan-paper)")}>{discipline.title}</h2>
             <img src="/assets/logos/iso-acid-nomark.png" alt="" style={s("height:clamp(118px,14vw,236px);width:auto;margin-left:clamp(-20px,-1.4vw,-6px);margin-top:clamp(-64px,-6vw,-24px);flex:none")} />
           </div>
-          <p style={s("max-width:360px;font-size:clamp(13px,1.05vw,16px);line-height:1.45;font-weight:500;color:#f5f3ec;margin:clamp(8px,1.2vw,24px) 0 0")}>{discipline.desc}</p>
+          <div style={s("max-width:360px;margin:clamp(8px,1.2vw,24px) 0 0")}>
+            <p style={s("font-size:clamp(13px,1.05vw,16px);line-height:1.45;font-weight:500;color:#f5f3ec;margin:0")}>{discipline.desc}</p>
+
+            {/* Señal de scroll: sin esto la subpágina "termina" visualmente en las
+                tarjetas de sub-servicio y nadie baja hasta los casos del área.
+                Solo existe si abajo hay algo a donde ir. */}
+            {casos.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => document.getElementById(CASOS_ANCHOR)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                style={s("display:inline-flex;align-items:center;gap:12px;margin-top:clamp(18px,1.8vw,28px);padding:0;background:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid)")}
+              >
+                Ver casos destacados
+                <ChevronDown className="stan-scrollhint" width={20} height={12} stroke="currentColor" strokeWidth={1.8} />
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {detail.length > 0 ? (
@@ -72,7 +93,7 @@ export function DisciplinaOverlay({
               <Marquee />
             </div>
 
-            <h3 style={s("margin:0 0 clamp(24px,3vw,48px);font-family:var(--font-grotesk);font-weight:500;font-size:clamp(20px,2vw,32px);letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper)")}>
+            <h3 id={CASOS_ANCHOR} style={s("margin:0 0 clamp(24px,3vw,48px);scroll-margin-top:clamp(16px,2vw,32px);font-family:var(--font-grotesk);font-weight:500;font-size:clamp(20px,2vw,32px);letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-paper)")}>
               Casos destacados
             </h3>
 

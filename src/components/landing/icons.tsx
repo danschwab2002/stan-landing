@@ -26,9 +26,9 @@ export function ArrowLeft({ width = 70, height = 12, strokeWidth = 1.5, stroke =
   );
 }
 
-export function ChevronDown({ width = 26, height = 16, strokeWidth = 1.6, stroke = "currentColor", style }: IconProps) {
+export function ChevronDown({ width = 26, height = 16, strokeWidth = 1.6, stroke = "currentColor", style, className }: IconProps) {
   return (
-    <svg width={width} height={height} viewBox="0 0 26 16" fill="none" style={style}>
+    <svg width={width} height={height} viewBox="0 0 26 16" fill="none" style={style} className={className}>
       <path d="M1 1L13 13L25 1" stroke={stroke} strokeWidth={strokeWidth} />
     </svg>
   );
