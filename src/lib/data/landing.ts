@@ -6,6 +6,19 @@ import { DEFAULT_SERVICES, type Caso } from "@/lib/landing-data";
 /** Cuántos casos mostrar al pie cuando la recomendación cae a random. */
 const MAX_RANDOM_RECS = 4;
 
+/** `gallery` viaja como JSON en texto (mismo criterio que `items`/`detail` de
+ *  disciplinas). Ante un valor corrupto se cae a lista vacía: el detalle del caso
+ *  se muestra sin stills antes que romper la landing entera. */
+function parseGallery(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((u): u is string => typeof u === "string" && u !== "") : [];
+  } catch {
+    return [];
+  }
+}
+
 /** Hasta `n` elementos al azar (Fisher-Yates parcial). */
 function pickRandom<T>(arr: T[], n: number): T[] {
   const a = [...arr];
@@ -127,6 +140,7 @@ async function loadCasos(onlyFeatured: boolean): Promise<Caso[]> {
       services: DEFAULT_SERVICES,
       recommended,
       video: r.videoUrl || undefined,
+      gallery: parseGallery(r.gallery),
     } satisfies Caso;
   });
 }

@@ -21,6 +21,7 @@ export const projects = sqliteTable("projects", {
   // 2 · Media
   coverUrl: text("cover_url").default(""),
   videoUrl: text("video_url").default(""), // Vimeo / YouTube / Storage
+  gallery: text("gallery").default("[]"), // JSON: string[] — stills del detalle del caso
 
   // 3 · Navegación
   slug: text("slug").notNull(),

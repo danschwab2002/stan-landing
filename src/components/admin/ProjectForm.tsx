@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { saveProject } from "@/app/admin/actions";
 import { ImageField } from "@/components/admin/ImageField";
+import { GalleryEditor } from "@/components/admin/GalleryEditor";
 import type { DisciplineRow, Project } from "@/lib/db/schema";
 
 const inputCls =
@@ -45,6 +46,15 @@ export function ProjectForm({
 }) {
   const selected = new Set(selectedDisciplineIds);
   const selectedRecs = new Set(selectedRecommendedIds);
+  // `gallery` viaja como JSON en texto; un valor corrupto no debe romper el panel.
+  const gallery: string[] = (() => {
+    try {
+      const parsed = JSON.parse(p?.gallery || "[]");
+      return Array.isArray(parsed) ? parsed.filter((u): u is string => typeof u === "string") : [];
+    } catch {
+      return [];
+    }
+  })();
   const otherProjects = allProjects.filter((op) => op.id !== p?.id);
   return (
     <form action={saveProject} className="grid gap-6">
@@ -119,6 +129,14 @@ export function ProjectForm({
         <div>
           <label className={labelCls}>Video (Vimeo / YouTube / Storage)</label>
           <input name="videoUrl" defaultValue={p?.videoUrl ?? ""} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Stills del proyecto</label>
+          <p className="mb-3 text-xs text-black/45">
+            Las fotos que se muestran al abrir el caso, debajo de la ficha técnica. Van en el
+            orden en que las pongas. <strong>Si no cargás ninguna, el bloque no aparece.</strong>
+          </p>
+          <GalleryEditor initial={gallery} />
         </div>
       </Family>
 

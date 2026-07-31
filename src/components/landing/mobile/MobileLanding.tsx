@@ -516,12 +516,21 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
               ))}
             </div>
 
-            <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:14px")}>Stills del proyecto</div>
-            <div style={s("display:flex;flex-direction:column;gap:12px;margin-bottom:8px")}>
-              {[0, 1].map((i) => (
-                <div key={i} style={s("border-radius:8px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")} />
-              ))}
-            </div>
+            {/* Stills del proyecto — se cargan desde el CMS (31/07). Antes eran dos
+                recuadros grises fijos; sin stills, el bloque entero (rótulo incluido)
+                no se muestra. */}
+            {current?.gallery && current.gallery.length > 0 ? (
+              <>
+                <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:14px")}>Stills del proyecto</div>
+                <div style={s("display:flex;flex-direction:column;gap:12px;margin-bottom:8px")}>
+                  {current.gallery.map((src, i) => (
+                    <div key={src} style={s("border-radius:8px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")}>
+                      <img src={src} alt={`${current.title} — still ${i + 1}`} loading="lazy" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : null}
 
             {/* Otros casos destacados (rabbit-hole: manual o random, Adriano 22/07) */}
             {recCasos.length > 0 ? (

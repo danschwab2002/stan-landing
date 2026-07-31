@@ -36,6 +36,10 @@ export type Caso = {
    *  siempre; se expone al landing para el banner de casos de la subpágina de
    *  área (BB Factor 29/07). Vacío = el banner va con la portada y sin play. */
   video?: string;
+  /** Stills del proyecto — las fotos que se muestran al abrir el caso, además
+   *  de la portada. Se cargan desde el CMS (subida directa). Vacío = el bloque
+   *  de stills no se muestra (antes eran 3 recuadros grises hardcodeados). */
+  gallery?: string[];
 };
 
 /**

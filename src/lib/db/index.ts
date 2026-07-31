@@ -75,6 +75,7 @@ async function init() {
       credits TEXT DEFAULT '',
       cover_url TEXT DEFAULT '',
       video_url TEXT DEFAULT '',
+      gallery TEXT DEFAULT '[]',
       slug TEXT NOT NULL,
       published INTEGER DEFAULT 0,
       featured INTEGER DEFAULT 0,
@@ -128,6 +129,7 @@ async function init() {
 
   // Migraciones ligeras para DBs ya creadas (SQLite no tiene ADD COLUMN IF NOT EXISTS).
   await ensureColumn("disciplines", "image", "image TEXT DEFAULT ''");
+  await ensureColumn("projects", "gallery", "gallery TEXT DEFAULT '[]'");
 
   const dCount = Number(
     (await getClient().execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0

@@ -89,6 +89,18 @@ function parseDetail(formData: FormData): { title: string; desc: string; image: 
     }))
     .filter((c) => c.title !== "");
 }
+/**
+ * Stills de un proyecto. El editor (`GalleryEditor`) emite un campo `galleryImage`
+ * por fila; acá se leen todos en el orden del DOM —que es el orden en que se van a
+ * mostrar— y se descartan las filas vacías (las que el usuario agregó y no llenó).
+ * Cada URL pasa por `assetUrl`, igual que el resto de los campos de imagen.
+ */
+function parseGallery(formData: FormData): string[] {
+  return formData
+    .getAll("galleryImage")
+    .map((v) => assetUrl(str(v)))
+    .filter(Boolean);
+}
 /** IDs de disciplinas tildadas en el multi-select. */
 function ids(formData: FormData, name: string): number[] {
   return formData
@@ -123,6 +135,7 @@ export async function saveProject(formData: FormData) {
     credits: str(formData.get("credits")),
     coverUrl: assetUrl(str(formData.get("coverUrl"))),
     videoUrl: httpUrl(str(formData.get("videoUrl"))),
+    gallery: JSON.stringify(parseGallery(formData)),
     slug: str(formData.get("slug")) || slugify(title),
     published: bool(formData.get("published")),
     featured: bool(formData.get("featured")),

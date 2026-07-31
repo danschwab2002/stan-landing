@@ -130,14 +130,26 @@ export function CasoOverlay({
         </div>
       </div>
 
-      {/* Stills */}
-      <div style={s("padding:0 clamp(24px,5vw,64px) clamp(20px,2.6vw,40px)")}>
-        <div style={s("display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.4vw,22px)")}>
-          {[0, 1, 2].map((i) => (
-            <div key={i} style={s("border-radius:0;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")} />
-          ))}
+      {/* Stills del proyecto — se cargan desde el CMS. Hasta el 31/07 esto eran tres
+          recuadros grises fijos: no existía el campo, así que no había nada que mostrar.
+          Sin stills cargados el bloque no se renderiza (mejor que dejar huecos grises). */}
+      {caso.gallery && caso.gallery.length > 0 && (
+        <div style={s("padding:0 clamp(24px,5vw,64px) clamp(20px,2.6vw,40px)")}>
+          <div style={s("display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.4vw,22px)")}>
+            {caso.gallery.map((src, i) => (
+              <div key={src} style={s("border-radius:0;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={`${caso.title} — still ${i + 1}`}
+                  loading="lazy"
+                  style={s("width:100%;height:100%;object-fit:cover;display:block")}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Otros casos destacados (rabbit-hole, ref Cacodelphia · decisión Adriano 22/07):
           manual desde el CMS o random. Grilla de cuadros portada + título → abre el caso. */}
