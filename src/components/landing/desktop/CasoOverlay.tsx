@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { s } from "../style";
-import { ArrowLeft, ArrowRight, PlayCircle } from "../icons";
+import { CasoVideo } from "../CasoVideo";
+import { ArrowLeft, ArrowRight } from "../icons";
 import { disciplineTitle, type Caso, type Discipline } from "@/lib/landing-data";
 
 const VTITLE = "writing-mode:vertical-rl;font-family:Bootzy;font-weight:400;font-size:clamp(38px,7vh,80px);letter-spacing:0.04em;text-transform:uppercase;color:#f5f3ec";
@@ -67,17 +68,21 @@ export function CasoOverlay({
           </div>
         </div>
 
-        {/* Video principal */}
-        <div style={s("position:relative;overflow:hidden;background:#1a1a1a;min-height:clamp(240px,42vh,520px)")}>
-          {caso.cover ? (
-            <div style={s("position:absolute;inset:0")}>
-              <img src={caso.cover} alt={caso.title} style={s("width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
-            </div>
-          ) : null}
-          <span style={s("position:absolute;top:clamp(12px,1.4vw,22px);right:clamp(14px,1.6vw,26px);z-index:2;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#f5f3ec")}>
-            Ver video <PlayCircle width={17} height={17} stroke="var(--stan-acid)" />
-          </span>
-        </div>
+        {/* Video principal. Hasta el 03/08 esto dibujaba la portada y un rótulo
+            "Ver video" decorativo: el campo del caso existía, era editable desde
+            el panel y no se mostraba en ningún lado. */}
+        <CasoVideo
+          // `key` por caso: al navegar de un caso a otro el overlay NO se desmonta
+          // (por eso también hay que resetear el scroll a mano, arriba). Sin esto,
+          // el reproductor sobrevive al cambio y el caso siguiente arrancaría solo
+          // — justo lo que Adriano pidió evitar. Cambiar la key lo vuelve a la
+          // portada con su play, como si abrieras una pagina nueva.
+          key={caso.key}
+          cover={caso.cover}
+          video={caso.video}
+          title={caso.title}
+          frame="position:relative;overflow:hidden;background:#1a1a1a;min-height:clamp(240px,42vh,520px)"
+        />
 
         {/* Ficha */}
         <div style={s("display:flex;flex-direction:column")}>

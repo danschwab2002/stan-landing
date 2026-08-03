@@ -216,8 +216,12 @@ export default function AyudaPage() {
                 apaisada le va a cortar los costados.
               </>,
               <>
-                <strong>Video.</strong> Se pega el link de Vimeo o YouTube. Los videos no
-                se suben al panel.
+                <strong>Video.</strong> Se sube desde la compu, igual que la portada. Se
+                reproduce cuando el visitante toca el play adentro del caso.{" "}
+                <a href="#videos" className="font-semibold underline">
+                  ver abajo
+                </a>
+                .
               </>,
               <>
                 <strong>Áreas.</strong> Tildá a cuál o cuáles pertenece. Esto es lo que
@@ -436,15 +440,40 @@ export default function AyudaPage() {
 
         <Section id="videos" n="07" title="Videos">
           <p>
-            Los videos <strong>no se suben al panel</strong>: se suben a Vimeo o YouTube y
-            acá se pega el link. Es lo que conviene — el video lo sirve la plataforma, que
-            se encarga de la calidad según la conexión de quien mira, y el sitio no se pone
-            pesado.
+            El video de un caso <strong>se sube desde la compu</strong>, igual que una
+            foto: entrás al proyecto, tocás <strong>Subir video</strong> y elegís el
+            archivo. Se aloja en el sitio, sin YouTube ni Vimeo de por medio — así el caso
+            se ve limpio, sin logos ajenos ni sugerencias de otros videos al terminar.
           </p>
           <p>
-            Si no querés que el video aparezca en las búsquedas de YouTube, subilo como{" "}
-            <strong>No listado</strong>: se ve perfecto embebido en el sitio pero no figura
-            en el canal.
+            <strong>Exportalo en 1080p.</strong> Es lo que se ve en pantalla y pesa una
+            fracción de un master. Si subís algo más grande, el sitio lo achica solo, pero
+            la subida tarda bastante más. El tope por archivo es de 600 MB.
+          </p>
+          <p>
+            Después de que la barra llega al 100%, el video queda un rato{" "}
+            <strong>preparándose</strong>: se lo está acomodando para que arranque rápido
+            en el navegador de quien entre. No cierres esa pantalla hasta que diga{" "}
+            <strong>Listo</strong>, y acordate de <strong>guardar el formulario</strong>{" "}
+            después.
+          </p>
+          <Ojo>
+            <p>
+              <strong>Dónde se ve.</strong> Adentro del caso, arriba de todo. La portada se
+              muestra con un botón de play encima, y el video arranca{" "}
+              <strong>solo cuando el visitante lo toca</strong> — nunca solo. En la grilla
+              de casos y en las páginas de área, el play que aparece sobre las imágenes es
+              una señal de que ese caso tiene video: lleva al caso, donde se reproduce.
+            </p>
+          </Ojo>
+          <p className="text-black/55">
+            El campo también acepta pegar un link de Vimeo o YouTube, por si algún video ya
+            está publicado ahí. Anda igual, pero en ese caso el reproductor es el de esa
+            plataforma, con su marca. Lo normal es subirlo.
+          </p>
+          <p className="text-black/55">
+            <strong>Si no cargás video</strong> en un caso, la portada se muestra sola y sin
+            botón de play. No queda nada roto ni a medias.
           </p>
         </Section>
 

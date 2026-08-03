@@ -42,10 +42,10 @@ function httpUrl(v: string): string {
 }
 
 /**
- * Igual que `httpUrl` pero para campos de imagen, que además aceptan rutas internas
- * (`/uploads/…` de una subida, `/assets/…` del repo). `httpUrl` solo las rechazaría:
- * `new URL("/uploads/x.webp")` tira porque no es absoluta — sin esto, toda imagen
- * subida se guardaría como cadena vacía.
+ * Igual que `httpUrl` pero para los campos que apuntan a un archivo, que además
+ * aceptan rutas internas (`/uploads/…` de una subida, `/assets/…` del repo).
+ * `httpUrl` solo las rechazaría: `new URL("/uploads/x.webp")` tira porque no es
+ * absoluta — sin esto, todo archivo subido se guardaría como cadena vacía.
  */
 function assetUrl(v: string): string {
   if (!v) return "";
@@ -159,7 +159,9 @@ export async function saveProject(formData: FormData) {
     longDesc: str(formData.get("longDesc")),
     credits: str(formData.get("credits")),
     coverUrl: assetUrl(str(formData.get("coverUrl"))),
-    videoUrl: httpUrl(str(formData.get("videoUrl"))),
+    // `assetUrl` y no `httpUrl`: desde el 03/08 el video se sube acá y llega como
+    // `/uploads/…`, que `httpUrl` descartaría por no ser una URL absoluta.
+    videoUrl: assetUrl(str(formData.get("videoUrl"))),
     gallery: JSON.stringify(parseGallery(formData)),
     services: JSON.stringify(await parseServices(formData)),
     slug: str(formData.get("slug")) || slugify(title),

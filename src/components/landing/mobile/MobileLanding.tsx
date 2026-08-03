@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { s } from "../style";
+import { CasoVideo } from "../CasoVideo";
 import { ArrowRight, ChevronDown, PlayCircle, Close } from "../icons";
 import { openCalendly } from "../calendly";
 import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
@@ -476,16 +477,19 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
             </button>
           </div>
           <div className="stanm" style={s("flex:1;overflow-y:auto;padding:0 18px 32px")}>
-            <div style={s("position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a;margin-bottom:22px")}>
-              {current?.cover ? (
-                <div style={s("position:absolute;inset:0")}>
-                  <img src={current.cover} alt={current.title} style={s("width:100%;height:100%;object-fit:cover;display:block")} />
-                </div>
-              ) : null}
-              <div style={s("position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none")}>
-                <PlayCircle width={54} height={54} stroke="#f5f3ec" strokeWidth={1.2} />
-              </div>
-            </div>
+            {/* Mismo componente que el detalle de desktop: el play era decorativo
+                (`pointer-events:none`) y el video del caso no se mostraba nunca. */}
+            <CasoVideo
+              // `key` por caso: el bottom-sheet sigue montado al pasar de un caso
+              // a otro, asi que sin esto el reproductor sobrevive al cambio y el
+              // caso siguiente arranca solo. Ver el gemelo en CasoOverlay.
+              key={current?.key}
+              cover={current?.cover}
+              video={current?.video}
+              title={current?.title ?? "el caso"}
+              frame="position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a;margin-bottom:22px"
+              buttonSize="64px"
+            />
 
             <div style={s("font-weight:700;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.6);margin-bottom:10px")}>{current?.tag}</div>
             <h2 style={s("margin:0 0 16px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:44px;line-height:0.98")}>{current?.title}</h2>

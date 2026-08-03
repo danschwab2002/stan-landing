@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { processVideo, type VideoProcessResult } from "@/lib/video";
 
 /**
- * Almacenamiento de imágenes del CMS — subida directa desde la compu.
+ * Almacenamiento de imágenes y videos del CMS — subida directa desde la compu.
  *
  * DÓNDE VIVEN LOS ARCHIVOS
  * No en `public/`: esa carpeta se resuelve en build time y el volumen persistente
@@ -34,14 +35,38 @@ export const UPLOADS_URL_PREFIX = "/uploads";
 /** Tope de la subida (antes de optimizar). Una foto de celular ronda los 3-8 MB. */
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
+/**
+ * Tope del video ANTES de procesar. Un master de un caso de 2-3 minutos exportado
+ * para web ronda los 100-300 MB; 600 deja lugar para un export generoso sin abrir
+ * la puerta a que alguien mande el proyecto entero de edición.
+ *
+ * Es el límite nuestro. El proxy que está delante de la app en el server tiene el
+ * suyo, y es el que corta primero — verificarlo ahí antes de prometerle un número
+ * al cliente.
+ */
+export const MAX_VIDEO_BYTES = 600 * 1024 * 1024;
+
 /** Ancho máximo que se guarda. Nada en la landing se muestra más grande que esto. */
 const MAX_WIDTH = 2400;
 
 /** Calidad del WebP. 82 es el punto donde deja de notarse la pérdida a ojo. */
 const WEBP_QUALITY = 82;
 
-/** Nombres generados por `saveImage`: slug + hash + .webp. El GET valida contra esto. */
-const SAFE_NAME = /^[a-z0-9][a-z0-9-]*\.webp$/;
+/**
+ * Nombres generados por `saveImage`/`saveVideoFromTemp`: slug + hash + extensión.
+ * El GET valida contra esto — es una allowlist, no un filtro de patrones feos.
+ */
+const SAFE_NAME = /^[a-z0-9][a-z0-9-]*\.(webp|mp4)$/;
+
+/** Content-Type de un archivo servido. El nombre ya pasó por `SAFE_NAME`. */
+export function contentTypeFor(name: string): string {
+  return name.endsWith(".mp4") ? "video/mp4" : "image/webp";
+}
+
+/** ¿El nombre es de un video? Lo usa el GET para decidir si soporta rangos. */
+export function isVideoName(name: string): boolean {
+  return name.endsWith(".mp4");
+}
 
 export type SavedImage = {
   url: string;
@@ -117,6 +142,98 @@ export async function saveImage(file: File): Promise<SavedImage> {
     height: info.height,
     bytes: output.length,
     originalBytes: input.length,
+  };
+}
+
+export type SavedVideo = {
+  url: string;
+  name: string;
+  bytes: number;
+  originalBytes: number;
+  /** Qué hizo ffmpeg. `passthrough` viene con `warning` para mostrar en el panel. */
+  action: VideoProcessResult["action"];
+  warning?: string;
+};
+
+/**
+ * Carpeta de staging de las subidas en curso, DENTRO del directorio de uploads.
+ *
+ * Tiene que estar en el mismo filesystem que el destino final: mover el archivo
+ * terminado se hace con `rename`, que es atómico e instantáneo dentro de un mount
+ * y falla con EXDEV cruzando montajes. Con el volumen de EasyPanel montado en
+ * `/data`, un temporal en `/tmp` sería justamente otro mount.
+ *
+ * Empieza con punto, así que ningún nombre de acá adentro puede pasar `SAFE_NAME`:
+ * un archivo a medio subir no es servible ni por accidente.
+ */
+export function tempDir(): string {
+  return path.join(uploadsDir(), ".tmp");
+}
+
+/**
+ * Toma un video ya volcado a disco, lo deja listo para la web y lo guarda.
+ *
+ * Recibe un path y no un `File` a propósito: un video de cientos de MB no puede
+ * pasar por `file.arrayBuffer()` como hacen las imágenes — eso lo carga entero en
+ * la RAM del contenedor. El endpoint lo streamea a `tempDir()` y hashea al vuelo;
+ * acá llega el archivo en disco y su hash ya calculado.
+ *
+ * El hash es del ORIGINAL, igual que en `saveImage`: subir dos veces el mismo
+ * archivo reusa el resultado en vez de recodificarlo de nuevo.
+ */
+export async function saveVideoFromTemp(
+  tempPath: string,
+  originalName: string,
+  hash: string
+): Promise<SavedVideo> {
+  const originalBytes = (await stat(tempPath)).size;
+  if (originalBytes === 0) throw new Error("El archivo está vacío.");
+
+  const name = `${slugify(originalName)}-${hash.slice(0, 10)}.mp4`;
+  const dir = uploadsDir();
+  await mkdir(dir, { recursive: true });
+  const finalPath = path.join(dir, name);
+
+  // Ya subido antes: el nombre lleva el hash del contenido, así que un archivo
+  // con este nombre es bit a bit el mismo. Recodificar de nuevo sería tirar CPU.
+  try {
+    const existing = await stat(finalPath);
+    return {
+      url: `${UPLOADS_URL_PREFIX}/${name}`,
+      name,
+      bytes: existing.size,
+      originalBytes,
+      action: "remux",
+    };
+  } catch {
+    // no existe, seguimos
+  }
+
+  const workPath = path.join(tempDir(), `${hash.slice(0, 10)}-out.mp4`);
+  await mkdir(tempDir(), { recursive: true });
+
+  let result: VideoProcessResult;
+  try {
+    result = await processVideo(tempPath, workPath);
+  } catch (err) {
+    await rm(workPath, { force: true });
+    // Los mensajes de acá los lee Adriano, no un dev.
+    if (err instanceof Error && err.message.startsWith("El archivo no es")) throw err;
+    throw new Error("No se pudo procesar el video. Probá exportándolo como MP4.");
+  }
+
+  // Solo ahora el archivo pasa a ser visible por el GET: hasta este rename vivió
+  // en `.tmp`, que ningún nombre servible puede alcanzar.
+  await rename(workPath, finalPath);
+  const bytes = (await stat(finalPath)).size;
+
+  return {
+    url: `${UPLOADS_URL_PREFIX}/${name}`,
+    name,
+    bytes,
+    originalBytes,
+    action: result.action,
+    warning: result.action === "passthrough" ? result.warning : undefined,
   };
 }
 

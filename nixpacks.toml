@@ -1,0 +1,17 @@
+# Config del build de EasyPanel (Nixpacks).
+#
+# Existe por una sola razón: meter ffmpeg en la imagen. Desde el 03/08 los videos
+# de los casos se hostean acá en vez de Vimeo/YouTube, y al subirlos se los pasa
+# por ffmpeg para dejarlos web-ready (ver src/lib/video.ts). Sin el binario, la
+# app degrada y guarda el archivo tal cual — anda, pero el video puede tardar en
+# empezar a reproducirse.
+#
+# Si el build NO es Nixpacks, este archivo queda inerte y hay que resolverlo del
+# otro lado: instalar ffmpeg en la imagen, o `npm i ffmpeg-static` y apuntar
+# FFMPEG_PATH a node_modules/ffmpeg-static/ffmpeg.
+#
+# `ffmpeg-full` trae también ffprobe, que es lo que sondea el archivo para decidir
+# si alcanza con copiar los streams o hay que recodificar de verdad.
+
+[phases.setup]
+nixPkgs = ["nodejs_22", "ffmpeg-full"]

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { saveProject } from "@/app/admin/actions";
 import { ImageField } from "@/components/admin/ImageField";
+import { VideoField } from "@/components/admin/VideoField";
 import { GalleryEditor } from "@/components/admin/GalleryEditor";
 import type { DisciplineRow, Project } from "@/lib/db/schema";
 import type { ServiceTag } from "@/lib/landing-data";
@@ -137,7 +138,7 @@ export function ProjectForm({
       <Family
         n="2"
         title="Recursos / media"
-        hint="La portada se sube desde la compu (se optimiza sola) o se pega como URL. El video va siempre por link."
+        hint="La portada y el video se suben desde la compu y se optimizan solos. Los dos aceptan también una URL, por si el archivo ya está publicado en otro lado."
       >
         <ImageField
           name="coverUrl"
@@ -146,10 +147,12 @@ export function ProjectForm({
           hint="Es la imagen de la tarjeta del caso y del encabezado del detalle. Vertical, se recorta a 3:4."
           previewClass="mt-2 h-28 w-20 rounded-lg object-cover"
         />
-        <div>
-          <label className={labelCls}>Video (Vimeo / YouTube / Storage)</label>
-          <input name="videoUrl" defaultValue={p?.videoUrl ?? ""} className={inputCls} />
-        </div>
+        <VideoField
+          name="videoUrl"
+          label="Video del caso"
+          defaultValue={p?.videoUrl}
+          hint="Se reproduce al abrir el caso, cuando el visitante toca el play. Si no cargás ninguno, la portada se muestra sola y sin botón."
+        />
         <div>
           <label className={labelCls}>Stills del proyecto</label>
           <p className="mb-3 text-xs text-black/45">

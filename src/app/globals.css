@@ -171,12 +171,42 @@ h1, h2, h3, h4, h5, h6, p { margin: 0; }
 @keyframes stan-bob    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 @keyframes stan-rotate { to { transform: rotate(360deg); } }
 
+@keyframes stan-play-beat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+
 /* Chevron del "Ver casos destacados" en la subpágina de área: el rebote es lo
    que delata que la página sigue más abajo. Se apaga si el visitante pidió
    menos movimiento. */
 .stan-scrollhint { animation: stan-bob 1.6s ease-in-out infinite; }
+
+/* CTA de play sobre el video de un caso (pedido de Adriano, 03/08: el rótulo
+   chiquito no se leía como clickeable).
+
+   Lo que se mueve es SOLO el disco de vidrio: se agranda y se achica parejo, y el
+   ícono se queda quieto en el centro. Hubo antes un anillo amarillo que se
+   expandía y se desvanecía — se sacó por competir con el vidrio, que es lo que le
+   da el carácter (Dan, 03/08).
+
+   DOS NÚMEROS QUE COSTARON UNA VUELTA:
+
+   - La CURVA no es `--ease-inout`: esa frena fuerte en los extremos y hace que el
+     movimiento se sienta como un latido. La sinusoidal sube y baja parejo, que es
+     la diferencia entre latir y respirar.
+   - La AMPLITUD arrancó en 1.09 y no se veía. Sobre un disco de 80px eso son 7px
+     repartidos en casi dos segundos: la animación existía y era invisible. Es el
+     tipo de cosa que un test que solo mira `animationName` da por buena — hay que
+     medir el ancho a lo largo del tiempo. */
+/* Solo la animación. La forma y el vidrio del disco van inline en el componente:
+   el procesador de CSS descarta `backdrop-filter` de la hoja servida, así que
+   escribirlo acá lo deja sin efecto de vidrio y sin aviso. */
+.stan-play-glass { animation: stan-play-beat 3s cubic-bezier(0.37, 0, 0.63, 1) infinite; }
+.stan-play { transition: transform 0.3s var(--ease-out); }
+button:hover > .stan-play { transform: scale(1.06); }
+/* Al apuntarlo, el disco se queda quieto: ya conseguiste la atención. */
+button:hover .stan-play-glass { animation-play-state: paused; }
+
 @media (prefers-reduced-motion: reduce) {
-  .stan-scrollhint { animation: none; }
+  .stan-scrollhint,
+  .stan-play-glass { animation: none; }
 }
 
 /* ---------- Utilidades del diseño ---------- */
