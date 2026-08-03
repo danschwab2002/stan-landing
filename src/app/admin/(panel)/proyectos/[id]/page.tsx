@@ -7,6 +7,7 @@ import {
   getProjectRecommendationIds,
 } from "@/lib/data/projects";
 import { getAllDisciplines } from "@/lib/data/disciplines";
+import { getServiceCatalog } from "@/lib/data/services";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 
 // Lee la DB (runtime-only): no prerenderizar en build, donde /data aún no existe.
@@ -22,13 +23,19 @@ export default async function EditarProyecto({
   const project = await getProject(projectId);
   if (!project) notFound();
 
-  const [disciplines, selectedDisciplineIds, allProjects, selectedRecommendedIds] =
-    await Promise.all([
-      getAllDisciplines(),
-      getProjectDisciplineIds(projectId),
-      getAllProjects(),
-      getProjectRecommendationIds(projectId),
-    ]);
+  const [
+    disciplines,
+    selectedDisciplineIds,
+    allProjects,
+    selectedRecommendedIds,
+    serviceCatalog,
+  ] = await Promise.all([
+    getAllDisciplines(),
+    getProjectDisciplineIds(projectId),
+    getAllProjects(),
+    getProjectRecommendationIds(projectId),
+    getServiceCatalog(),
+  ]);
 
   return (
     <div className="max-w-2xl">
@@ -47,6 +54,7 @@ export default async function EditarProyecto({
         selectedDisciplineIds={selectedDisciplineIds}
         allProjects={allProjects}
         selectedRecommendedIds={selectedRecommendedIds}
+        serviceCatalog={serviceCatalog}
       />
     </div>
   );

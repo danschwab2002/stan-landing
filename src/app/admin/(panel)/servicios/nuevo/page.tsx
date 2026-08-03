@@ -1,25 +1,23 @@
 import Link from "next/link";
-import { getPublishedProjects } from "@/lib/data/projects";
-import { DisciplineForm } from "@/components/admin/DisciplineForm";
+import { ServiceForm } from "@/components/admin/ServiceForm";
 
 // Importa la cadena de acceso a la DB (el cliente libsql abre eager): no
 // prerenderizar en build, donde /data aún no existe. Panel dinámico.
 export const dynamic = "force-dynamic";
 
-export default async function NuevaDisciplina() {
-  const projects = await getPublishedProjects();
+export default function NuevoServicio() {
   return (
     <div className="max-w-2xl">
       <Link
-        href="/admin/disciplinas"
+        href="/admin/servicios"
         className="text-xs font-semibold text-black/45 hover:text-[#16170f]"
       >
-        ← Áreas
+        ← Servicios
       </Link>
       <h1 className="mb-6 mt-2 font-display text-3xl font-black tracking-[0.07em]">
-        Nueva área
+        Nuevo servicio
       </h1>
-      <DisciplineForm projects={projects.map((p) => ({ slug: p.slug, title: p.title }))} />
+      <ServiceForm />
     </div>
   );
 }

@@ -121,6 +121,7 @@ const INDICE = [
   { id: "casos", label: "Cargar un caso" },
   { id: "donde", label: "Dónde aparece cada caso" },
   { id: "areas", label: "Las áreas" },
+  { id: "servicios", label: "Los servicios (“Lo que hicimos”)" },
   { id: "imagenes", label: "Imágenes" },
   { id: "videos", label: "Videos" },
   { id: "contacto", label: "Contacto" },
@@ -162,7 +163,7 @@ export default function AyudaPage() {
       <div className="grid gap-5">
         <Section id="mapa" n="01" title="Cómo funciona el panel">
           <p>
-            El panel administra tres cosas, y son las tres del menú de la izquierda:
+            El panel administra cuatro cosas, y son las cuatro del menú de la izquierda:
           </p>
           <ul className="grid list-disc gap-2 pl-5 marker:text-black/30">
             <li>
@@ -172,6 +173,10 @@ export default function AyudaPage() {
             <li>
               <strong>Áreas</strong> — los cuatro bloques de “Qué hacemos”, con su
               descripción y su página propia.
+            </li>
+            <li>
+              <strong>Servicios</strong> — la lista de “Lo que hicimos” (dirección,
+              producción, filmación…) que después tildás en cada caso.
             </li>
             <li>
               <strong>Contacto</strong> — el link de WhatsApp y el de Calendly que usan los
@@ -218,6 +223,16 @@ export default function AyudaPage() {
                 <strong>Áreas.</strong> Tildá a cuál o cuáles pertenece. Esto es lo que
                 hace que el caso aparezca dentro de la página de esa área —{" "}
                 <a href="#donde" className="font-semibold underline">
+                  ver abajo
+                </a>
+                .
+              </>,
+              <>
+                <strong>Lo que hicimos.</strong> Tildá los servicios que se hicieron{" "}
+                <em>en este proyecto</em>: son los íconos que salen al pie de la ficha. Si
+                fue una cobertura donde filmaron y editaron pero no hubo dirección
+                creativa, destildá esa. Si no tocás nada, se muestran todos —{" "}
+                <a href="#servicios" className="font-semibold underline">
                   ver abajo
                 </a>
                 .
@@ -297,22 +312,108 @@ export default function AyudaPage() {
             </li>
             <li>
               <strong>Tarjetas del área</strong> — los servicios de adentro, cada uno con su
-              título, su foto y una línea de descripción. Se numeran solas y se ordenan con
-              las flechitas.
+              título, su foto, una línea de descripción y el{" "}
+              <strong>proyecto relacionado</strong>. Se numeran solas y se ordenan con las
+              flechitas.
             </li>
             <li>
               <strong>Imagen del área</strong> — la foto grande del bloque en la portada. Si
               la dejás vacía queda un recuadro gris.
             </li>
           </ul>
+
+          <p className="font-semibold">El “Proyecto relacionado” de cada tarjeta</p>
+          <p>
+            Cada tarjeta del área puede llevar a un caso. Elegís cuál en el desplegable del
+            final de la tarjeta y, cuando alguien la toca en el sitio, va derecho a ese
+            proyecto. Sirve para mostrar <em>tu mejor ejemplo</em> de ese servicio: si la
+            tarjeta dice “Campañas”, elegís la campaña que más te guste mostrar.
+          </p>
+          <ul className="grid list-disc gap-2 pl-5 marker:text-black/30">
+            <li>
+              Va <strong>un solo</strong> proyecto por tarjeta. Una vez adentro del caso, el
+              bloque de recomendados del pie sigue llevando al visitante a otros trabajos.
+            </li>
+            <li>
+              Si lo dejás en <strong>“Ninguno”</strong>, la tarjeta se sigue viendo pero no
+              se puede tocar. No es un error: es lo normal hasta que le elijas uno.
+            </li>
+            <li>
+              Solo aparecen en la lista los proyectos <strong>publicados</strong>, para que
+              la tarjeta no lleve a una página que nadie puede ver.
+            </li>
+          </ul>
           <Ojo>
-            El campo <strong>Key</strong> no se toca. Es el vínculo interno con los
+            Si cambiás el <strong>slug</strong> de un proyecto, las tarjetas que apuntaban a
+            él dejan de ser clickeables (se ven, pero no llevan a ningún lado). No se rompe
+            nada; hay que volver a elegirlo en el desplegable.
+          </Ojo>
+
+          <Ojo>
+            El campo <strong>Key</strong> del área no se toca. Es el vínculo interno con los
             proyectos: si lo cambiás, todos los casos que tenía asociados quedan sueltos y
             hay que volver a tildarlos uno por uno.
           </Ojo>
         </Section>
 
-        <Section id="imagenes" n="05" title="Imágenes">
+        <Section id="servicios" n="05" title="Los servicios (“Lo que hicimos”)">
+          <p>
+            Al pie de cada caso hay una fila de íconos con lo que se hizo en ese trabajo:
+            dirección creativa, producción, filmación, postproducción. Esa lista la
+            administrás vos desde{" "}
+            <Link href="/admin/servicios" className="font-semibold underline">
+              Servicios
+            </Link>
+            , y después en cada proyecto tildás cuáles corresponden.
+          </p>
+          <p className="font-semibold">Son dos cosas distintas</p>
+          <ul className="grid list-disc gap-2 pl-5 marker:text-black/30">
+            <li>
+              <strong>Servicios</strong> (esta sección) — <em>qué opciones existen</em>. Acá
+              creás “Dirección de arte” o “Streaming” si te falta alguna.
+            </li>
+            <li>
+              <strong>Lo que hicimos</strong> (dentro de cada proyecto) — <em>cuáles se
+              hicieron en ese caso</em>. Es tildar casillas.
+            </li>
+          </ul>
+          <p className="font-semibold">Para agregar un servicio nuevo</p>
+          <Pasos
+            items={[
+              <>
+                Pedile al equipo de diseño el <strong>ícono</strong>: un PNG con fondo
+                transparente, en el amarillo de la marca, igual que los que ya están.
+              </>,
+              <>
+                Andá a <strong>Servicios → + Nuevo servicio</strong>, poné el nombre y subí
+                el ícono con el mismo botón de siempre.
+              </>,
+              <>
+                <strong>Guardar.</strong> Aparece solo en todos los casos que no tengan
+                nada tildado, y queda disponible para tildar en el resto.
+              </>,
+            ]}
+          />
+          <Ojo>
+            Un caso <strong>sin nada tildado muestra todos</strong> los servicios de la
+            lista. Por eso, al crear uno nuevo, no hace falta entrar a los casos viejos uno
+            por uno. Y si a un caso le destildás todos, el bloque “Lo que hicimos”
+            directamente no aparece en su ficha.
+          </Ojo>
+          <p>
+            <strong>Renombrar</strong> un servicio es seguro: cambia el texto en todos los
+            casos y no desvincula ninguno. <strong>Borrarlo</strong> lo saca de todas las
+            fichas donde salía — la lista te avisa en cuántos casos aparece antes de que
+            confirmes.
+          </p>
+          <p className="text-black/55">
+            El <em>identificador interno</em> que ves al editar no se puede cambiar: es la
+            etiqueta con la que cada proyecto tiene guardado el servicio. Para cambiar lo
+            que se lee, editá el nombre.
+          </p>
+        </Section>
+
+        <Section id="imagenes" n="06" title="Imágenes">
           <p>
             En todos los campos de foto tenés el botón <strong>Subir imagen</strong>: elegís
             el archivo de la computadora y se sube ahí mismo. Acepta hasta 20 MB, así que
@@ -333,7 +434,7 @@ export default function AyudaPage() {
           </p>
         </Section>
 
-        <Section id="videos" n="06" title="Videos">
+        <Section id="videos" n="07" title="Videos">
           <p>
             Los videos <strong>no se suben al panel</strong>: se suben a Vimeo o YouTube y
             acá se pega el link. Es lo que conviene — el video lo sirve la plataforma, que
@@ -347,7 +448,7 @@ export default function AyudaPage() {
           </p>
         </Section>
 
-        <Section id="contacto" n="07" title="Contacto">
+        <Section id="contacto" n="08" title="Contacto">
           <p>
             En{" "}
             <Link href="/admin/contacto" className="font-semibold underline">
@@ -381,7 +482,7 @@ export default function AyudaPage() {
           </p>
         </Section>
 
-        <Section id="problemas" n="08" title="Si algo no se ve">
+        <Section id="problemas" n="09" title="Si algo no se ve">
           <p>Casi siempre es una de estas cinco, en este orden:</p>
           <Pasos
             items={[

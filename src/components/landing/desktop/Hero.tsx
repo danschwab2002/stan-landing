@@ -1,5 +1,5 @@
 import { s } from "../style";
-import { ArrowRight, ChevronDown, PlayCircle } from "../icons";
+import { ArrowRight, ChevronDown } from "../icons";
 import { CalendlyButton } from "../calendly";
 import { SITE } from "@/lib/landing-data";
 
@@ -68,10 +68,10 @@ export function Hero({ calendlyUrl }: { calendlyUrl: string }) {
                 Ver proyectos
                 <ArrowRight width={52} height={10} />
               </a>
-              <a className="stan-textlink" href="#reel" style={s("font-size:clamp(12px,1.1vw,15px)")}>
-                <PlayCircle width={17} height={17} stroke="var(--stan-acid)" />
-                Ver Reel 2026
-              </a>
+              {/* El CTA "Ver Reel 2026" se dio de baja el 03/08 (Adriano): el master 2026 no
+                  existe todavia —el reel disponible es el de 2025 con el logo viejo— y el boton
+                  le competia a "Ver proyectos" y al CTA de contacto. El ReelOverlay queda
+                  intacto y sigue abriendose por #reel; para reactivarlo, devolver este link. */}
             </div>
           </div>
         </div>

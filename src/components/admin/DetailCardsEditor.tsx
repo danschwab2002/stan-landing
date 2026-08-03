@@ -7,7 +7,10 @@ const inputCls =
   "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#16170f]";
 const labelCls = "mb-1.5 block text-xs font-semibold uppercase tracking-wider text-black/55";
 
-export type DetailCard = { title: string; desc: string; image?: string };
+export type DetailCard = { title: string; desc: string; image?: string; projectSlug?: string };
+
+/** Opción del selector "Proyecto relacionado" — los proyectos publicados. */
+export type ProjectOption = { slug: string; title: string };
 
 /** Fila con identidad local estable: React necesita una `key` que sobreviva al
  *  reordenamiento, si no el estado interno de cada `ImageField` sigue a la
@@ -21,20 +24,27 @@ type Row = DetailCard & { uid: number };
  * Reemplaza al textarea con sintaxis «Título :: descripción», que funcionaba pero
  * era indescubrible para el cliente y se rompía con un separador mal tipeado.
  *
- * **Cómo viajan los datos:** cada tarjeta emite tres campos con el MISMO nombre
- * (`detailTitle` / `detailImage` / `detailDesc`); la Server Action los lee con
- * `getAll()` y los cruza por índice. Los tres arrays quedan alineados porque el
- * orden del DOM es el orden de las tarjetas y una tarjeta sin imagen igual emite
- * su campo vacío. Así el form sigue siendo nativo, sin serializar JSON a mano.
+ * **Cómo viajan los datos:** cada tarjeta emite cuatro campos con el MISMO nombre
+ * (`detailTitle` / `detailImage` / `detailDesc` / `detailProject`); la Server Action
+ * los lee con `getAll()` y los cruza por índice. Los arrays quedan alineados porque
+ * el orden del DOM es el orden de las tarjetas y una tarjeta sin imagen —o sin
+ * proyecto— igual emite su campo vacío. Así el form sigue siendo nativo, sin
+ * serializar JSON a mano.
  */
-export function DetailCardsEditor({ initial }: { initial: DetailCard[] }) {
+export function DetailCardsEditor({
+  initial,
+  projects = [],
+}: {
+  initial: DetailCard[];
+  projects?: ProjectOption[];
+}) {
   const [rows, setRows] = useState<Row[]>(() =>
     initial.map((c, i) => ({ ...c, uid: i }))
   );
   const [nextUid, setNextUid] = useState(initial.length);
 
   function add() {
-    setRows((r) => [...r, { title: "", desc: "", image: "", uid: nextUid }]);
+    setRows((r) => [...r, { title: "", desc: "", image: "", projectSlug: "", uid: nextUid }]);
     setNextUid((n) => n + 1);
   }
 
@@ -125,6 +135,27 @@ export function DetailCardsEditor({ initial }: { initial: DetailCard[] }) {
                 className={inputCls}
                 placeholder="Diseñamos campañas de contenido a medida para cada marca."
               />
+            </div>
+
+            <div>
+              <label className={labelCls}>Proyecto relacionado</label>
+              <select
+                name="detailProject"
+                defaultValue={row.projectSlug ?? ""}
+                className={inputCls}
+              >
+                <option value="">— Ninguno (la tarjeta no se puede clickear) —</option>
+                {projects.map((p) => (
+                  <option key={p.slug} value={p.slug}>
+                    {p.title}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1.5 text-xs text-black/45">
+                Al clickear esta tarjeta, el visitante va directo a ese caso. Elegí el que
+                mejor represente el sub-servicio: es la vidriera de “{row.title || "esta tarjeta"}”.
+                Si lo dejás en “Ninguno”, la tarjeta se ve pero no lleva a ningún lado.
+              </p>
             </div>
           </div>
         </fieldset>

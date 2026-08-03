@@ -17,6 +17,12 @@ import {
   updateDiscipline,
 } from "@/lib/data/disciplines";
 import { setSiteSettings } from "@/lib/data/settings";
+import {
+  createService,
+  deleteService,
+  getServiceCatalog,
+  updateService,
+} from "@/lib/data/services";
 import { normalizeInstagram } from "@/lib/instagram";
 import { requireAuth } from "@/lib/auth-server";
 import { isInternalAssetPath } from "@/lib/uploads";
@@ -76,16 +82,22 @@ function lines(v: FormDataEntryValue | null): string[] {
  * de los campos de imagen (acepta `/uploads/…` y `/assets/…`, descarta el resto
  * que no sea http(s)).
  */
-function parseDetail(formData: FormData): { title: string; desc: string; image: string }[] {
+function parseDetail(
+  formData: FormData
+): { title: string; desc: string; image: string; projectSlug: string }[] {
   const titles = formData.getAll("detailTitle");
   const descs = formData.getAll("detailDesc");
   const images = formData.getAll("detailImage");
+  // "Proyecto relacionado" (Adriano 03/08): el <select> emite el slug elegido, o
+  // "" en la opción vacía. Viaja igual que los otros tres: un campo por tarjeta.
+  const slugs = formData.getAll("detailProject");
 
   return titles
     .map((t, i) => ({
       title: str(t),
       desc: str(descs[i] ?? ""),
       image: assetUrl(str(images[i] ?? "")),
+      projectSlug: str(slugs[i] ?? ""),
     }))
     .filter((c) => c.title !== "");
 }
@@ -101,6 +113,18 @@ function parseGallery(formData: FormData): string[] {
     .map((v) => assetUrl(str(v)))
     .filter(Boolean);
 }
+/**
+ * "Lo que hicimos" de un proyecto (Adriano 03/08). Llegan las `key` tildadas y se
+ * validan contra el catálogo vivo de la DB: así una key inventada a mano no llega a
+ * guardarse, y las que sí entran quedan **en el orden del catálogo**, no en el del
+ * click, para que el bloque se vea igual en todos los casos.
+ */
+async function parseServices(formData: FormData): Promise<string[]> {
+  const picked = new Set(formData.getAll("services").map((v) => str(v)));
+  const catalog = await getServiceCatalog();
+  return catalog.filter((s) => picked.has(s.key)).map((s) => s.key);
+}
+
 /** IDs de disciplinas tildadas en el multi-select. */
 function ids(formData: FormData, name: string): number[] {
   return formData
@@ -115,6 +139,7 @@ function revalidateAll() {
   revalidatePath("/work");
   revalidatePath("/admin/proyectos");
   revalidatePath("/admin/disciplinas");
+  revalidatePath("/admin/servicios");
 }
 
 /** Crea o actualiza un proyecto desde el formulario del molde. */
@@ -136,6 +161,7 @@ export async function saveProject(formData: FormData) {
     coverUrl: assetUrl(str(formData.get("coverUrl"))),
     videoUrl: httpUrl(str(formData.get("videoUrl"))),
     gallery: JSON.stringify(parseGallery(formData)),
+    services: JSON.stringify(await parseServices(formData)),
     slug: str(formData.get("slug")) || slugify(title),
     published: bool(formData.get("published")),
     featured: bool(formData.get("featured")),
@@ -215,6 +241,43 @@ export async function removeDiscipline(formData: FormData) {
   await deleteDiscipline(id);
   revalidateAll();
   redirect("/admin/disciplinas");
+}
+
+/**
+ * Crea o actualiza un servicio del catálogo de "Lo que hicimos".
+ *
+ * La `key` se deriva del nombre al crear y **queda congelada al editar**: es lo que
+ * guardan los proyectos en `projects.services`, así que cambiarla desataría de golpe
+ * todos los casos que lo tenían tildado. Renombrar "Filmación" a "Registro" cambia
+ * el label en toda la landing y no toca ningún proyecto — que es el comportamiento
+ * que se espera de un catálogo.
+ */
+export async function saveService(formData: FormData) {
+  await requireAuth();
+  const id = str(formData.get("id"));
+  const label = str(formData.get("label"));
+
+  const data = {
+    label,
+    icon: assetUrl(str(formData.get("icon"))),
+    sortOrder: Number(str(formData.get("sortOrder")) || "0"),
+  };
+
+  if (id) {
+    await updateService(Number(id), data);
+  } else {
+    await createService({ ...data, key: str(formData.get("key")) || slugify(label) });
+  }
+
+  revalidateAll();
+  redirect("/admin/servicios");
+}
+
+export async function removeService(formData: FormData) {
+  await requireAuth();
+  await deleteService(Number(str(formData.get("id"))));
+  revalidateAll();
+  redirect("/admin/servicios");
 }
 
 /** Toggle inline de publicado desde la lista de disciplinas. */

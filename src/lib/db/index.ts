@@ -1,7 +1,7 @@
 import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
-import { DISCIPLINES, SITE } from "@/lib/landing-data";
+import { DISCIPLINES, SERVICE_SEED, SITE } from "@/lib/landing-data";
 import { normalizeInstagram } from "@/lib/instagram";
 import { SEED_PROJECTS } from "./seed-data";
 
@@ -127,9 +127,27 @@ async function init() {
   `);
   await seedSettings();
 
+  // Catálogo de "Lo que hicimos" (03/08). Editable desde el panel para que sumar
+  // un ícono no dependa de un deploy.
+  await getClient().execute(`
+    CREATE TABLE IF NOT EXISTS services (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key TEXT NOT NULL UNIQUE,
+      label TEXT NOT NULL,
+      icon TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0,
+      created_at TEXT,
+      updated_at TEXT
+    )
+  `);
+  await seedServices();
+
   // Migraciones ligeras para DBs ya creadas (SQLite no tiene ADD COLUMN IF NOT EXISTS).
   await ensureColumn("disciplines", "image", "image TEXT DEFAULT ''");
   await ensureColumn("projects", "gallery", "gallery TEXT DEFAULT '[]'");
+  // "Lo que hicimos" por proyecto (Adriano 03/08). Vacío = los 4 de siempre, así
+  // que la columna entra sin cambiar nada de lo que ya está publicado.
+  await ensureColumn("projects", "services", "services TEXT DEFAULT '[]'");
 
   const dCount = Number(
     (await getClient().execute(`SELECT COUNT(*) AS c FROM disciplines`)).rows[0]?.c ?? 0
@@ -194,6 +212,24 @@ async function seedSettings() {
     await getClient().execute({
       sql: `INSERT OR IGNORE INTO settings (key, value) VALUES (?,?)`,
       args: [key, value],
+    });
+  }
+}
+
+/**
+ * Siembra el catálogo de servicios con los 4 de siempre. `INSERT OR IGNORE` por `key`:
+ * corre en cada `ensureDb` y solo crea lo que falta, así al deployar entran los 4 sin
+ * pisar los que Adriano haya editado ni resucitar los que haya borrado a propósito
+ * — un servicio eliminado desde el panel se queda eliminado.
+ */
+async function seedServices() {
+  for (let i = 0; i < SERVICE_SEED.length; i++) {
+    const sv = SERVICE_SEED[i];
+    const now = new Date().toISOString();
+    await getClient().execute({
+      sql: `INSERT OR IGNORE INTO services (key, label, icon, sort_order, created_at, updated_at)
+            VALUES (?,?,?,?,?,?)`,
+      args: [sv.key, sv.label, sv.icon, i, now, now],
     });
   }
 }

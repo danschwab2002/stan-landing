@@ -118,15 +118,23 @@ export function CasoOverlay({
           ) : null}
           <p style={s("font-size:clamp(13px,1vw,15px);line-height:1.5;color:#f5f3ec;margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid rgba(245,243,236,0.16)")}>{caso.lead}</p>
           <p style={s("font-size:clamp(13px,1vw,15px);line-height:1.5;color:rgba(245,243,236,0.82);margin:0 0 22px")}>{caso.body}</p>
-          <div style={s("font-family:var(--font-grotesk);font-weight:900;font-size:clamp(16px,1.5vw,22px);letter-spacing:0.01em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:20px")}>Lo que hicimos</div>
-          <div style={s("display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,22px);margin-top:auto;padding-top:20px;border-top:1px solid rgba(245,243,236,0.16)")}>
-            {caso.services.map((sv) => (
-              <div key={sv.label} style={s("display:flex;flex-direction:column;gap:12px")}>
-                <img src={sv.icon} alt="" style={s("height:38px;width:auto;align-self:flex-start;display:block")} />
-                <span style={s("font-size:12px;line-height:1.3;color:rgba(245,243,236,0.85)")}>{sv.label}</span>
+          {/* "Lo que hicimos" — se elige por proyecto desde el panel (Adriano 03/08).
+              Sin ninguno tildado el bloque entero no se dibuja, en vez de dejar el
+              titulo colgado sobre una grilla vacia. La grilla se adapta a cuantos
+              haya: con 2 iconos no quedan 2 columnas fantasma. */}
+          {caso.services.length > 0 ? (
+            <>
+              <div style={s("font-family:var(--font-grotesk);font-weight:900;font-size:clamp(16px,1.5vw,22px);letter-spacing:0.01em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:20px")}>Lo que hicimos</div>
+              <div style={s(`display:grid;grid-template-columns:repeat(${Math.min(caso.services.length, 4)},1fr);gap:clamp(10px,1.4vw,22px);margin-top:auto;padding-top:20px;border-top:1px solid rgba(245,243,236,0.16)`)}>
+                {caso.services.map((sv) => (
+                  <div key={sv.key} style={s("display:flex;flex-direction:column;gap:12px")}>
+                    <img src={sv.icon} alt="" style={s("height:38px;width:auto;align-self:flex-start;display:block")} />
+                    <span style={s("font-size:12px;line-height:1.3;color:rgba(245,243,236,0.85)")}>{sv.label}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          ) : null}
         </div>
       </div>
 

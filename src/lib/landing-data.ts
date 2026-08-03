@@ -7,7 +7,9 @@
  * base de datos — por eso el shape ya está pensado como modelo editable.
  */
 
-export type ServiceTag = { icon: string; label: string };
+/** `key` es el identificador estable que se guarda en `projects.services`; el
+ *  label y el icono pueden cambiar sin migrar dato. */
+export type ServiceTag = { key: string; icon: string; label: string };
 
 export type Caso = {
   key: string;
@@ -47,7 +49,17 @@ export type Caso = {
  * `image` es opcional a propósito: las tarjetas cargadas antes de que el campo
  * existiera se siguen leyendo igual y caen al recuadro gris, sin migrar nada.
  */
-export type DisciplineDetailItem = { title: string; desc: string; image?: string };
+/**
+ * Tarjeta de sub-servicio dentro de la subpágina de un área (Content → Campañas,
+ * Social Content, …). `projectSlug` es el "Proyecto relacionado" que se elige desde
+ * el panel (Adriano 03/08): al clickear la tarjeta se abre ESE caso.
+ *
+ * Se guarda el **slug** y no el id para que el JSON de `detail` se pueda leer y
+ * auditar a ojo. El precio es que renombrar el slug de un proyecto corta el vínculo
+ * — por eso el render valida que el slug exista antes de hacer la tarjeta
+ * clickeable: un slug muerto degrada a tarjeta estática, no a un click que no abre nada.
+ */
+export type DisciplineDetailItem = { title: string; desc: string; image?: string; projectSlug?: string };
 
 export type Discipline = {
   key: string;
@@ -61,17 +73,41 @@ export type Discipline = {
   detail?: DisciplineDetailItem[];
 };
 
-/** "Lo que hicimos" — roles/tareas ejecutados en el proyecto (dirección,
- *  producción, filmación, post). Es un dato POR CASO, distinto de las Áreas
- *  ("Qué hacemos" = líneas de servicio de la productora). Hoy default común a
- *  todos los casos; a futuro, editable por caso desde el panel. NOTA: "Servicios"
- *  NO es una colección aparte — Servicios = Áreas (consolidado 22/07). */
-export const DEFAULT_SERVICES: ServiceTag[] = [
-  { icon: "/assets/imagery/ic-direccion.png", label: "Dirección creativa" },
-  { icon: "/assets/imagery/ic-produccion.png", label: "Producción" },
-  { icon: "/assets/imagery/ic-filmacion.png", label: "Filmación" },
-  { icon: "/assets/imagery/ic-postproduccion.png", label: "Postproducción" },
+/**
+ * "Lo que hicimos" — roles/tareas ejecutados en el proyecto (dirección, producción,
+ * filmación, post). Es un dato POR CASO, distinto de las Áreas ("Qué hacemos" =
+ * líneas de servicio de la productora): un caso puede pertenecer al área Content y
+ * aun así no haber tenido dirección creativa.
+ *
+ * **Esto es solo la semilla.** El catálogo vivo vive en la tabla `services` y se
+ * edita desde el panel (`/admin/servicios`): sumar un ícono no puede depender de un
+ * deploy, porque después de la entrega Dan ya no está. Estos 4 se insertan con
+ * `INSERT OR IGNORE` en el primer arranque y nunca vuelven a pisar lo que haya.
+ */
+export const SERVICE_SEED: ServiceTag[] = [
+  { key: "direccion", icon: "/assets/imagery/ic-direccion.png", label: "Dirección creativa" },
+  { key: "produccion", icon: "/assets/imagery/ic-produccion.png", label: "Producción" },
+  { key: "filmacion", icon: "/assets/imagery/ic-filmacion.png", label: "Filmación" },
+  { key: "postproduccion", icon: "/assets/imagery/ic-postproduccion.png", label: "Postproducción" },
 ];
+
+/**
+ * Resuelve las keys guardadas en un proyecto contra el catálogo vivo.
+ *
+ * - Sin keys → **todo el catálogo**: un caso que nadie tocó se sigue viendo como
+ *   antes de que la columna existiera.
+ * - Una key que ya no está en el catálogo se ignora en silencio: borrar un servicio
+ *   desde el panel no rompe los casos que lo tenían tildado.
+ * - El orden sale del catálogo, no del guardado, para que el bloque se vea igual
+ *   en todos los casos.
+ */
+export function servicesFromKeys(
+  keys: string[] | undefined,
+  catalog: ServiceTag[]
+): ServiceTag[] {
+  if (!keys || keys.length === 0) return catalog;
+  return catalog.filter((s) => keys.includes(s.key));
+}
 
 // NOTA: `client`, `year` y `disciplines` son datos SEED provisorios (feedback
 // Adriano 20/07). Se reemplazan cuando Adriano cargue sus proyectos reales
@@ -88,7 +124,7 @@ export const CASOS: Caso[] = [
     disciplines: ["content", "production"],
     lead: "Video lanzamiento de la Selección Argentina de Voley.",
     body: "Una pieza audiovisual concebida para transmitir identidad, energía y espíritu de equipo a través de una narrativa visual de alto impacto.",
-    services: DEFAULT_SERVICES,
+    services: SERVICE_SEED,
   },
   {
     key: "chandon",
@@ -100,7 +136,7 @@ export const CASOS: Caso[] = [
     disciplines: ["production", "content"],
     lead: "Ideas que cobraron vida. Proyectos que generaron impacto.",
     body: "Dirección, producción y postproducción de una pieza pensada para conectar con la audiencia y construir marca.",
-    services: DEFAULT_SERVICES,
+    services: SERVICE_SEED,
   },
   {
     key: "galicia-polo",
@@ -112,7 +148,7 @@ export const CASOS: Caso[] = [
     disciplines: ["content"],
     lead: "Ideas que cobraron vida. Proyectos que generaron impacto.",
     body: "Dirección, producción y postproducción de una pieza pensada para conectar con la audiencia y construir marca.",
-    services: DEFAULT_SERVICES,
+    services: SERVICE_SEED,
   },
   {
     key: "converse",
@@ -124,7 +160,7 @@ export const CASOS: Caso[] = [
     disciplines: ["content"],
     lead: "Ideas que cobraron vida. Proyectos que generaron impacto.",
     body: "Dirección, producción y postproducción de una pieza pensada para conectar con la audiencia y construir marca.",
-    services: DEFAULT_SERVICES,
+    services: SERVICE_SEED,
   },
 ];
 

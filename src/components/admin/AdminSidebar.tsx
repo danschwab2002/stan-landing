@@ -13,6 +13,7 @@ import { signOut } from "@/app/admin/login/actions";
 const SECTIONS = [
   { label: "Proyectos", href: "/admin/proyectos", enabled: true },
   { label: "Áreas", href: "/admin/disciplinas", enabled: true },
+  { label: "Servicios", href: "/admin/servicios", enabled: true },
   { label: "Contacto", href: "/admin/contacto", enabled: true },
 ];
 

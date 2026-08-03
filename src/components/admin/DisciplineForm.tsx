@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { saveDiscipline } from "@/app/admin/actions";
-import { DetailCardsEditor, type DetailCard } from "@/components/admin/DetailCardsEditor";
+import {
+  DetailCardsEditor,
+  type DetailCard,
+  type ProjectOption,
+} from "@/components/admin/DetailCardsEditor";
 import { ImageField } from "@/components/admin/ImageField";
 import type { DisciplineRow } from "@/lib/db/schema";
 
@@ -40,7 +44,14 @@ function parseArr<T>(raw: string | null | undefined, fallback: T): T {
   }
 }
 
-export function DisciplineForm({ discipline: d }: { discipline?: DisciplineRow }) {
+export function DisciplineForm({
+  discipline: d,
+  projects = [],
+}: {
+  discipline?: DisciplineRow;
+  /** Proyectos publicados, para el selector "Proyecto relacionado" de cada tarjeta. */
+  projects?: ProjectOption[];
+}) {
   const itemsText = parseArr<string[]>(d?.items, []).join("\n");
   // Las tarjetas guardadas antes de que existiera `image` llegan sin ese campo:
   // el editor las toma igual y quedan con el recuadro gris hasta que se les cargue una.
@@ -112,9 +123,9 @@ export function DisciplineForm({ discipline: d }: { discipline?: DisciplineRow }
       <Family
         n="3"
         title="Tarjetas del área"
-        hint="La página que se abre al clickear “Ver área”. Cada tarjeta lleva su título, su imagen y una descripción corta; se numeran solas en el orden de acá. Sin tarjetas, el área no muestra ese botón (salvo que tenga casos asociados)."
+        hint="La página que se abre al clickear “Ver área”. Cada tarjeta lleva su título, su imagen, una descripción corta y el proyecto al que lleva; se numeran solas en el orden de acá. Sin tarjetas, el área no muestra ese botón (salvo que tenga casos asociados)."
       >
-        <DetailCardsEditor initial={detailCards} />
+        <DetailCardsEditor initial={detailCards} projects={projects} />
       </Family>
 
       {/* 4 · Publicación & orden */}

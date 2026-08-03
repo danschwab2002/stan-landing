@@ -106,10 +106,10 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
               Ver proyectos
               <ArrowRight width={56} height={11} />
             </a>
-            <a onClick={() => setReelOpen(true)} style={s("display:inline-flex;align-items:center;gap:10px;min-height:44px;text-decoration:none;font-weight:500;font-size:16px;letter-spacing:0.12em;text-transform:uppercase;color:#f5f3ec;cursor:pointer")}>
-              <PlayCircle width={20} height={20} stroke="var(--stan-acid)" />
-              Ver Reel 2026
-            </a>
+            {/* El CTA "Ver Reel 2026" se dio de baja el 03/08 (Adriano): el master 2026 no
+                existe todavia —el reel disponible es el de 2025 con el logo viejo— y el boton
+                le competia a "Ver proyectos" y al CTA de contacto. El overlay de abajo queda
+                intacto: para reactivarlo, devolver este <a> con onClick={() => setReelOpen(true)}. */}
           </div>
           <div style={s("display:flex;align-items:center;gap:10px;margin-top:26px")}>
             <img src="/assets/logos/iso-acid.png" alt="STAN iso" style={s("display:block;width:26px;height:auto;flex:none")} />
@@ -151,11 +151,9 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
                   ) : null}
                 </div>
                 <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.84);margin:0")}>{d.desc}</p>
-                <ul style={s("list-style:none;margin:20px 0 0;padding:16px 0 0;border-top:1px solid rgba(245,243,236,0.16);display:flex;flex-direction:column;gap:11px")}>
-                  {d.items.map((it) => (
-                    <li key={it} style={s("font-size:16px;color:rgba(245,243,236,0.72)")}>{it}</li>
-                  ))}
-                </ul>
+                {/* El detalle de lo que incluye cada servicio (d.items) NO va en mobile
+                    (Adriano/BB 03/08: con 4 areas la seccion se hacia interminable en el
+                    telefono). En desktop se mantiene — el cambio es solo de esta superficie. */}
                 {clickable ? (
                   <span style={s("display:inline-flex;align-items:center;gap:10px;min-height:44px;margin-top:12px;font-weight:700;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-acid)")}>
                     Ver área <ArrowRight width={40} height={11} stroke="var(--stan-acid)" />
@@ -214,7 +212,9 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
 
       {/* 03 · MANIFESTO */}
       <section ref={manifestoRef} style={s("position:relative;background:#0d0d0d;padding:60px 22px 56px;overflow:hidden")}>
-        <div style={s("display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px")}>
+        {/* El aire de arriba y de abajo del anillo es deliberado (Adriano 03/08): el rotulo
+            "03 · NUESTRO MANIFIESTO" y el pie de marca quedaban pegados al circulo que gira. */}
+        <div style={s("display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:32px")}>
           <span style={s("font-weight:700;font-size:13px;color:var(--stan-acid)")}>{SITE.manifesto.n}</span>
           <span style={s("font-weight:500;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;color:#f5f3ec")}>{SITE.manifesto.label}</span>
         </div>
@@ -232,7 +232,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
             style={s("position:absolute;inset:0;width:100%;height:100%")}
           />
         </div>
-        <div style={s("display:flex;align-items:center;gap:10px;justify-content:center;margin-top:20px")}>
+        <div style={s("display:flex;align-items:center;gap:10px;justify-content:center;margin-top:40px")}>
           <img src="/assets/logos/iso-acid.png" alt="STAN iso" style={s("display:block;width:26px;height:auto;flex:none")} />
           <div style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;line-height:1.7;color:rgba(245,243,236,0.66);text-align:center")}>
             {SITE.tagline[0]}
@@ -244,13 +244,16 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
 
       {/* 04 · CONTACTO */}
       <section ref={contactRef} style={s("position:relative;background:#0d0d0d;padding:44px 22px 40px")}>
-        {/* Imagen de marca (hardcoded, no editable). Vacía → placeholder gris. */}
+        {/* Imagen de marca (hardcoded, no editable). Vacía → placeholder gris.
+            El recuadro es 1/1 en mobile y 4/5 en desktop: en el telefono el 4/5 se leia
+            "demasiado largo, demasiado vertical" (Adriano 03/08) y empujaba el contacto
+            fuera de pantalla. El encuadre aguanta el recorte (la silla esta centrada). */}
         {SITE.contact.image ? (
-          <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;margin-bottom:28px")}>
+          <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:1/1;margin-bottom:28px")}>
             <img src={SITE.contact.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
           </div>
         ) : (
-          <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:4/5;background:#1a1a1a;margin-bottom:28px")} />
+          <div style={s("border-radius:20px;overflow:hidden;aspect-ratio:1/1;background:#1a1a1a;margin-bottom:28px")} />
         )}
         <h2 style={s("margin:0 0 18px;font-family:'Bootzy',var(--font-grotesk);font-weight:400;font-size:66px;line-height:0.84;letter-spacing:0.02em;color:var(--stan-acid);text-transform:uppercase")}>
           {SITE.contact.title[0]}
@@ -260,16 +263,11 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
         <p style={s("margin:0 0 24px;font-size:19px;line-height:1.34;font-weight:700;color:#f5f3ec")}>
           Contanos tu idea. Nosotros <span style={s("font-style:italic;text-decoration:underline;text-underline-offset:3px")}>la llevamos a otro nivel.</span>
         </p>
-        {/* CTA de agendamiento: abre Calendly en popup flotante. */}
-        <button
-          onClick={() => (settings.calendlyUrl ? void openCalendly(settings.calendlyUrl) : go("contact"))}
-          style={s("display:inline-flex;align-items:center;gap:12px;margin-bottom:32px;background:var(--stan-acid);color:#0d0d0d;border:none;padding:15px 26px;border-radius:999px;font-family:var(--font-grotesk);font-weight:900;font-size:15px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer")}
-        >
-          Agendá una llamada
-          <ArrowRight width={40} height={11} strokeWidth={2} />
-        </button>
-
-        <div style={s("display:flex;flex-direction:column")}>
+        {/* El CTA "Agendá una llamada" NO va en mobile (Adriano 03/08): la barra fija de
+            "Trabajemos juntos" esta siempre a la vista y abre el mismo Calendly, asi que
+            dos botones amarillos apilados eran el mismo destino dos veces. En desktop se
+            mantiene (no hay CTA fija ahi) — ver Contacto.tsx. */}
+        <div style={s("display:flex;flex-direction:column;margin-top:32px")}>
           {([
             // Punto de contacto: solo WhatsApp (Adriano 22/07); agendar = Calendly
             // embebido arriba. Instagram + Ubicación quedan como contexto de marca.
@@ -297,12 +295,15 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
         <span style={s("font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,243,236,0.5)")}>{SITE.footer.right}</span>
       </div>
 
-      {/* spacer para la CTA fija */}
-      <div style={s("height:86px")} />
+      {/* spacer para la CTA fija (acompaña la altura de abajo: 46 + 11*2 + aire) */}
+      <div style={s("height:74px")} />
 
-      {/* CTA FIJA */}
-      <div style={s("position:fixed;left:0;right:0;bottom:0;z-index:40;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(13,13,13,0) 0%,rgba(13,13,13,0.9) 34%,#0d0d0d 100%)")}>
-        <button onClick={() => (settings.calendlyUrl ? void openCalendly(settings.calendlyUrl) : go("contact"))} style={s("width:100%;min-height:54px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--stan-acid);color:#0d0d0d;border:none;border-radius:999px;font-family:var(--font-grotesk);font-weight:900;font-size:16px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 26px -10px rgba(0,0,0,0.8)")}>
+      {/* CTA FIJA — se le bajo la altura el 03/08 (Adriano/BB): el bloque amarillo de punta
+          a punta le competia al movimiento del logo. Se achica SOLO el alto; el ancho full
+          se mantiene a proposito ("me gusta que este de punta a punta"). Sigue por encima
+          del minimo tactil de 44px. */}
+      <div style={s("position:fixed;left:0;right:0;bottom:0;z-index:40;padding:11px 16px calc(11px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(13,13,13,0) 0%,rgba(13,13,13,0.9) 34%,#0d0d0d 100%)")}>
+        <button onClick={() => (settings.calendlyUrl ? void openCalendly(settings.calendlyUrl) : go("contact"))} style={s("width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--stan-acid);color:#0d0d0d;border:none;border-radius:999px;font-family:var(--font-grotesk);font-weight:900;font-size:15px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 26px -10px rgba(0,0,0,0.8)")}>
           Trabajemos juntos
           <ArrowRight width={42} height={11} strokeWidth={2} />
         </button>
@@ -383,18 +384,36 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
 
             {(disc.detail ?? []).length > 0 ? (
               <div style={s("display:flex;flex-direction:column;gap:26px;margin-bottom:36px")}>
-                {(disc.detail ?? []).map((item, i) => (
-                  <div key={`${i}-${item.title}`} style={s("display:flex;flex-direction:column")}>
-                    <span style={s("font-weight:700;font-size:12px;color:var(--stan-acid);margin-bottom:8px")}>{`0${i + 1}.`}</span>
-                    <h3 style={s("margin:0 0 12px;font-weight:700;font-size:19px;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
-                    <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:12px")}>
-                      {item.image ? (
-                        <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                {(disc.detail ?? []).map((item, i) => {
+                  // "Proyecto relacionado" (Adriano 03/08) — mismo criterio que en
+                  // desktop: el slug se valida contra los casos disponibles, y si
+                  // quedo huerfano la tarjeta se degrada a estatica.
+                  const target = item.projectSlug
+                    ? areaCasos.find((c) => c.key === item.projectSlug)
+                    : undefined;
+                  return (
+                    <div
+                      key={`${i}-${item.title}`}
+                      onClick={target ? () => setOpenIdx(areaCasos.findIndex((x) => x.key === target.key)) : undefined}
+                      style={s(`display:flex;flex-direction:column${target ? ";cursor:pointer" : ""}`)}
+                    >
+                      <span style={s("font-weight:700;font-size:12px;color:var(--stan-acid);margin-bottom:8px")}>{`0${i + 1}.`}</span>
+                      <h3 style={s("margin:0 0 12px;font-weight:700;font-size:19px;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
+                      <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:12px")}>
+                        {item.image ? (
+                          <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                        ) : null}
+                      </div>
+                      <p style={s("font-size:15px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
+                      {target ? (
+                        <span style={s("display:inline-flex;align-items:center;gap:10px;min-height:44px;margin-top:8px;font-weight:700;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-acid)")}>
+                          Ver proyecto
+                          <ArrowRight width={34} height={10} stroke="var(--stan-acid)" />
+                        </span>
                       ) : null}
                     </div>
-                    <p style={s("font-size:15px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : null}
 
@@ -506,15 +525,21 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
             <p style={s("font-size:18px;line-height:1.5;color:#f5f3ec;margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid rgba(245,243,236,0.16)")}>{current?.lead}</p>
             <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.82);margin:0 0 28px")}>{current?.body}</p>
 
-            <div style={s("font-family:var(--font-grotesk);font-weight:900;font-size:20px;letter-spacing:0.01em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:18px")}>Lo que hicimos</div>
-            <div style={s("display:grid;grid-template-columns:1fr 1fr;gap:18px;padding-top:20px;border-top:1px solid rgba(245,243,236,0.16);margin-bottom:30px")}>
-              {(current?.services ?? []).map((sv) => (
-                <div key={sv.label} style={s("display:flex;flex-direction:column;gap:10px")}>
-                  <img src={sv.icon} alt="" style={s("height:34px;width:auto;align-self:flex-start;display:block")} />
-                  <span style={s("font-size:15px;line-height:1.3;color:rgba(245,243,236,0.85)")}>{sv.label}</span>
+            {/* "Lo que hicimos" — mismo criterio que en desktop: se elige por proyecto
+                desde el panel y sin ninguno tildado el bloque no se dibuja. */}
+            {(current?.services ?? []).length > 0 ? (
+              <>
+                <div style={s("font-family:var(--font-grotesk);font-weight:900;font-size:20px;letter-spacing:0.01em;text-transform:uppercase;color:var(--stan-acid);margin-bottom:18px")}>Lo que hicimos</div>
+                <div style={s("display:grid;grid-template-columns:1fr 1fr;gap:18px;padding-top:20px;border-top:1px solid rgba(245,243,236,0.16);margin-bottom:30px")}>
+                  {(current?.services ?? []).map((sv) => (
+                    <div key={sv.key} style={s("display:flex;flex-direction:column;gap:10px")}>
+                      <img src={sv.icon} alt="" style={s("height:34px;width:auto;align-self:flex-start;display:block")} />
+                      <span style={s("font-size:15px;line-height:1.3;color:rgba(245,243,236,0.85)")}>{sv.label}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            ) : null}
 
             {/* Stills del proyecto — se cargan desde el CMS (31/07). Antes eran dos
                 recuadros grises fijos; sin stills, el bloque entero (rótulo incluido)

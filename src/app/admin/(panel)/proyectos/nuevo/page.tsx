@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getServiceCatalog } from "@/lib/data/services";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 import { getAllDisciplines } from "@/lib/data/disciplines";
 import { getAllProjects } from "@/lib/data/projects";
@@ -7,9 +8,10 @@ import { getAllProjects } from "@/lib/data/projects";
 export const dynamic = "force-dynamic";
 
 export default async function NuevoProyecto() {
-  const [disciplines, allProjects] = await Promise.all([
+  const [disciplines, allProjects, serviceCatalog] = await Promise.all([
     getAllDisciplines(),
     getAllProjects(),
+    getServiceCatalog(),
   ]);
   return (
     <div className="max-w-2xl">
@@ -22,7 +24,11 @@ export default async function NuevoProyecto() {
       <h1 className="mb-6 mt-2 font-display text-3xl font-black tracking-[0.07em]">
         Nuevo proyecto
       </h1>
-      <ProjectForm disciplines={disciplines} allProjects={allProjects} />
+      <ProjectForm
+        disciplines={disciplines}
+        allProjects={allProjects}
+        serviceCatalog={serviceCatalog}
+      />
     </div>
   );
 }

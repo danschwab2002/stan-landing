@@ -22,6 +22,7 @@ export const projects = sqliteTable("projects", {
   coverUrl: text("cover_url").default(""),
   videoUrl: text("video_url").default(""), // Vimeo / YouTube / Storage
   gallery: text("gallery").default("[]"), // JSON: string[] — stills del detalle del caso
+  services: text("services").default("[]"), // JSON: string[] — keys de "Lo que hicimos" (vacío = todas)
 
   // 3 · Navegación
   slug: text("slug").notNull(),
@@ -93,6 +94,27 @@ export const projectRecommendations = sqliteTable(
 );
 
 /**
+ * Colección "Servicios" — el catálogo de "Lo que hicimos" (dirección, producción,
+ * filmación, post, y los que sumen). Es un dato POR CASO, distinto de las Áreas:
+ * las Áreas son las líneas de servicio de la productora ("Qué hacemos"), esto son
+ * los roles ejecutados en un proyecto puntual. La relación con `projects` va por
+ * `projects.services` (JSON de `key`), no por tabla puente: es una lista corta y
+ * sin atributos propios en la relación.
+ *
+ * Vive en la DB —y no como constante— para que sumar un ícono no dependa de Dan
+ * (decisión 03/08): BB Factor manda el PNG y Adriano lo carga desde el panel.
+ */
+export const services = sqliteTable("services", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  key: text("key").notNull().unique(), // slug estable — es lo que se guarda en projects.services
+  label: text("label").notNull(),
+  icon: text("icon").default(""),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: text("created_at"),
+  updatedAt: text("updated_at"),
+});
+
+/**
  * Ajustes globales del sitio (key-value). Datos que no pertenecen a un proyecto
  * ni a un área: hoy los dos puntos de contacto que Adriano quiere administrar
  * (validación 22/07) — `whatsapp_url` (link directo) y `calendly_url` (URL del
@@ -109,3 +131,5 @@ export type NewProject = typeof projects.$inferInsert;
 export type DisciplineRow = typeof disciplines.$inferSelect;
 export type NewDisciplineRow = typeof disciplines.$inferInsert;
 export type SettingRow = typeof settings.$inferSelect;
+export type ServiceRow = typeof services.$inferSelect;
+export type NewServiceRow = typeof services.$inferInsert;

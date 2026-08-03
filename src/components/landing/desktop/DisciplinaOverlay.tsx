@@ -1,5 +1,5 @@
 import { s } from "../style";
-import { ArrowLeft, ChevronDown, PlayCircle } from "../icons";
+import { ArrowLeft, ArrowRight, ChevronDown, PlayCircle } from "../icons";
 import { Marquee } from "./Marquee";
 import { casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
 
@@ -67,18 +67,39 @@ export function DisciplinaOverlay({
 
         {detail.length > 0 ? (
           <div style={s("display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,2.6vw,50px)")}>
-            {detail.map((item, i) => (
-              <div key={`${i}-${item.title}`} style={s("display:flex;flex-direction:column")}>
-                <span style={s("font-weight:700;font-size:12px;letter-spacing:0.02em;color:var(--stan-acid);margin-bottom:12px")}>{`0${i + 1}.`}</span>
-                <h3 style={s("margin:0 0 22px;font-family:var(--font-grotesk);font-weight:700;font-size:clamp(16px,1.35vw,21px);letter-spacing:0.005em;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
-                <div style={s("border-radius:clamp(9px,1vw,14px);overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;margin-bottom:20px")}>
-                  {item.image ? (
-                    <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+            {detail.map((item, i) => {
+              // "Proyecto relacionado" (Adriano 03/08): la tarjeta abre ese caso.
+              // Se valida contra los casos disponibles antes de hacerla clickeable —
+              // si el slug quedo huerfano (proyecto renombrado o despublicado), la
+              // tarjeta se degrada a estatica en vez de ofrecer un click muerto.
+              const target = item.projectSlug
+                ? allCasos.find((c) => c.key === item.projectSlug)
+                : undefined;
+              return (
+                <div
+                  key={`${i}-${item.title}`}
+                  onClick={target ? () => onOpenCaso(target.key) : undefined}
+                  style={s(`display:flex;flex-direction:column${target ? ";cursor:pointer" : ""}`)}
+                >
+                  <span style={s("font-weight:700;font-size:12px;letter-spacing:0.02em;color:var(--stan-acid);margin-bottom:12px")}>{`0${i + 1}.`}</span>
+                  <h3 style={s("margin:0 0 22px;font-family:var(--font-grotesk);font-weight:700;font-size:clamp(16px,1.35vw,21px);letter-spacing:0.005em;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
+                  <div style={s("border-radius:clamp(9px,1vw,14px);overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;margin-bottom:20px")}>
+                    {item.image ? (
+                      <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                    ) : null}
+                  </div>
+                  <p style={s("font-size:13px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
+                  {/* La señal de que se puede clickear: sin esto la tarjeta se ve igual
+                      que una estatica y nadie descubre que lleva a algun lado. */}
+                  {target ? (
+                    <span style={s("display:inline-flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--stan-acid)")}>
+                      Ver proyecto
+                      <ArrowRight width={30} height={10} stroke="var(--stan-acid)" />
+                    </span>
                   ) : null}
                 </div>
-                <p style={s("font-size:13px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : null}
 

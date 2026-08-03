@@ -3,6 +3,7 @@ import { saveProject } from "@/app/admin/actions";
 import { ImageField } from "@/components/admin/ImageField";
 import { GalleryEditor } from "@/components/admin/GalleryEditor";
 import type { DisciplineRow, Project } from "@/lib/db/schema";
+import type { ServiceTag } from "@/lib/landing-data";
 
 const inputCls =
   "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#16170f]";
@@ -37,12 +38,15 @@ export function ProjectForm({
   selectedDisciplineIds = [],
   allProjects = [],
   selectedRecommendedIds = [],
+  serviceCatalog = [],
 }: {
   project?: Project;
   disciplines?: DisciplineRow[];
   selectedDisciplineIds?: number[];
   allProjects?: Project[];
   selectedRecommendedIds?: number[];
+  /** Catálogo vivo de "Lo que hicimos" (tabla `services`, editable en el panel). */
+  serviceCatalog?: ServiceTag[];
 }) {
   const selected = new Set(selectedDisciplineIds);
   const selectedRecs = new Set(selectedRecommendedIds);
@@ -55,6 +59,22 @@ export function ProjectForm({
       return [];
     }
   })();
+  // "Lo que hicimos": las keys tildadas. Un proyecto que nunca se editó llega con
+  // la lista vacía y la landing le muestra las 4 por defecto — por eso acá también
+  // arrancan todas tildadas: lo que se ve en el panel es lo que se ve en la web.
+  const savedServices: string[] = (() => {
+    try {
+      const parsed = JSON.parse(p?.services || "[]");
+      return Array.isArray(parsed) ? parsed.filter((k): k is string => typeof k === "string") : [];
+    } catch {
+      return [];
+    }
+  })();
+  const selectedServices =
+    savedServices.length > 0
+      ? new Set(savedServices)
+      : new Set(serviceCatalog.map((sv) => sv.key));
+
   const otherProjects = allProjects.filter((op) => op.id !== p?.id);
   return (
     <form action={saveProject} className="grid gap-6">
@@ -183,6 +203,51 @@ export function ProjectForm({
             </div>
           )}
         </div>
+      </Family>
+
+      {/* 3b · "Lo que hicimos" — servicios ejecutados EN ESTE proyecto */}
+      <Family
+        n="3b"
+        title="Lo que hicimos"
+        hint="Los íconos que aparecen al pie del caso. Tildá solo lo que se hizo realmente en este proyecto: si fue una cobertura donde filmaron y editaron pero no hubo dirección creativa, destildá esa. Si no tocás nada, se muestran todos."
+      >
+        {serviceCatalog.length === 0 ? (
+          <p className="text-sm text-black/45">
+            No hay servicios cargados.{" "}
+            <Link href="/admin/servicios/nuevo" className="font-semibold underline">
+              Creá el primero
+            </Link>
+            .
+          </p>
+        ) : (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {serviceCatalog.map((sv) => (
+            <label
+              key={sv.key}
+              className="flex items-center gap-2.5 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium"
+            >
+              <input
+                type="checkbox"
+                name="services"
+                value={sv.key}
+                defaultChecked={selectedServices.has(sv.key)}
+                className="h-4 w-4 accent-[#16170f]"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {sv.icon ? <img src={sv.icon} alt="" className="h-5 w-auto opacity-70" /> : null}
+              {sv.label}
+            </label>
+          ))}
+        </div>
+        )}
+        <p className="text-xs text-black/45">
+          Si los destildás todos, el bloque “Lo que hicimos” no aparece en el caso. Para
+          agregar o sacar opciones de esta lista, andá a{" "}
+          <Link href="/admin/servicios" className="font-semibold underline">
+            Servicios
+          </Link>
+          .
+        </p>
       </Family>
 
       {/* 4 · Áreas (relación M2M con "Qué hacemos") */}

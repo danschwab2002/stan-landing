@@ -1,15 +1,17 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db, ensureDb } from "@/lib/db";
 import { projects, disciplines, projectDisciplines, projectRecommendations } from "@/lib/db/schema";
-import { DEFAULT_SERVICES, type Caso } from "@/lib/landing-data";
+import { servicesFromKeys, type Caso } from "@/lib/landing-data";
+import { getServiceCatalog } from "@/lib/data/services";
 
 /** Cuántos casos mostrar al pie cuando la recomendación cae a random. */
 const MAX_RANDOM_RECS = 4;
 
-/** `gallery` viaja como JSON en texto (mismo criterio que `items`/`detail` de
- *  disciplinas). Ante un valor corrupto se cae a lista vacía: el detalle del caso
- *  se muestra sin stills antes que romper la landing entera. */
-function parseGallery(raw: string | null | undefined): string[] {
+/** `gallery` y `services` viajan como JSON en texto (mismo criterio que
+ *  `items`/`detail` de disciplinas). Ante un valor corrupto se cae a lista vacía:
+ *  el caso se muestra sin stills —o con los servicios por defecto— antes que
+ *  romper la landing entera. */
+function parseStrList(raw: string | null | undefined): string[] {
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
@@ -115,6 +117,8 @@ async function loadCasos(onlyFeatured: boolean): Promise<Caso[]> {
   }
 
   const allSlugs = rows.map((r) => r.slug);
+  // Una sola lectura del catálogo para todos los casos del lote.
+  const serviceCatalog = await getServiceCatalog();
 
   return rows.map((r) => {
     const title = r.title ?? "";
@@ -137,10 +141,12 @@ async function loadCasos(onlyFeatured: boolean): Promise<Caso[]> {
       disciplines: keysByProject.get(r.id) ?? [],
       lead: r.shortDesc ?? "",
       body: r.longDesc ?? "",
-      services: DEFAULT_SERVICES,
+      // Vacío → todo el catálogo (ver servicesFromKeys): un caso que nadie tocó
+      // se sigue viendo igual que antes de que existiera la columna.
+      services: servicesFromKeys(parseStrList(r.services), serviceCatalog),
       recommended,
       video: r.videoUrl || undefined,
-      gallery: parseGallery(r.gallery),
+      gallery: parseStrList(r.gallery),
     } satisfies Caso;
   });
 }
