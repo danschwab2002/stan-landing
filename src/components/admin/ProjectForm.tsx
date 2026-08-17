@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { saveProject } from "@/app/admin/actions";
 import { ImageField } from "@/components/admin/ImageField";
+import { USO_PORTADA_CASO } from "@/lib/image-usos";
 import { VideoField } from "@/components/admin/VideoField";
 import { GalleryEditor } from "@/components/admin/GalleryEditor";
 import type { DisciplineRow, Project } from "@/lib/db/schema";
@@ -144,7 +145,8 @@ export function ProjectForm({
           name="coverUrl"
           label="Portada"
           defaultValue={p?.coverUrl}
-          hint="Es la imagen de la tarjeta del caso y del encabezado del detalle. Vertical, se recorta a 3:4."
+          usos={USO_PORTADA_CASO}
+          hint="Es la imagen de la tarjeta del caso y del encabezado del detalle. Se muestra en varias formas según dónde aparezca — abajo elegís qué parte se ve en cada una."
           previewClass="mt-2 h-28 w-20 rounded-lg object-cover"
         />
         <VideoField

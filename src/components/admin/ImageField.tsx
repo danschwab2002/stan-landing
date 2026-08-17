@@ -1,6 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { EditorEncuadre } from "@/components/admin/EditorEncuadre";
+import { FOCAL_DEFAULT, parseFocal, withFocal, type Focal } from "@/lib/focal";
+import type { Uso } from "@/lib/image-usos";
 
 const inputCls =
   "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#16170f]";
@@ -23,24 +26,36 @@ function kb(bytes: number): string {
  *
  * El valor real viaja en un input oculto: el form sigue siendo un form nativo con
  * Server Action, sin estado compartido con el resto de los campos.
+ *
+ * Si el campo declara `usos`, aparece además el selector de encuadre: la imagen se
+ * guarda entera y el recorte se decide acá (ver `lib/focal.ts`). Los campos que no
+ * lo declaran — los íconos, que se muestran completos y sin recortar — siguen
+ * funcionando exactamente como antes.
  */
 export function ImageField({
   name,
   label,
   defaultValue = "",
   hint,
+  usos,
   previewClass = "mt-2 aspect-[16/11] w-56 rounded-lg object-cover",
 }: {
   name: string;
   label: string;
   defaultValue?: string | null;
   hint?: string;
+  usos?: Uso[];
   previewClass?: string;
 }) {
-  const [value, setValue] = useState(defaultValue ?? "");
+  const inicial = parseFocal(defaultValue);
+  // La URL y su encuadre se manejan por separado y se vuelven a unir recién al
+  // guardar: así el campo de texto muestra una dirección limpia, sin el `#f=…`.
+  const [value, setValue] = useState(inicial.src);
+  const [focal, setFocal] = useState<Focal>(inicial.focal);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState<Uploaded | null>(null);
+  const [editando, setEditando] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function upload(file: File) {
@@ -58,6 +73,8 @@ export function ImageField({
       if (!res.ok) throw new Error(data?.error ?? "No se pudo subir la imagen.");
 
       setValue(data.url);
+      // Foto nueva, encuadre nuevo: el de la anterior no tiene por qué servirle.
+      setFocal({ ...FOCAL_DEFAULT });
       setSaved(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo subir la imagen.");
@@ -76,7 +93,11 @@ export function ImageField({
         <input
           type="text"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            // Pegar otra dirección es cambiar de imagen: el encuadre vuelve al centro.
+            setValue(parseFocal(e.target.value).src);
+            setFocal({ ...FOCAL_DEFAULT });
+          }}
           className={`${inputCls} min-w-0 flex-1`}
           placeholder="Subí una imagen o pegá una URL"
         />
@@ -88,11 +109,21 @@ export function ImageField({
         >
           {busy ? "Subiendo…" : "Subir imagen"}
         </button>
+        {value && usos?.length ? (
+          <button
+            type="button"
+            onClick={() => setEditando(true)}
+            className="shrink-0 rounded-lg border border-black/15 bg-white px-4 py-2 text-sm font-semibold transition-colors hover:border-[#16170f]"
+          >
+            Editar imagen
+          </button>
+        ) : null}
         {value && (
           <button
             type="button"
             onClick={() => {
               setValue("");
+              setFocal({ ...FOCAL_DEFAULT });
               setSaved(null);
               setError("");
             }}
@@ -104,8 +135,8 @@ export function ImageField({
         )}
       </div>
 
-      {/* El valor que realmente lee la Server Action. */}
-      <input type="hidden" name={name} value={value} />
+      {/* El valor que realmente lee la Server Action: la dirección con su encuadre pegado. */}
+      <input type="hidden" name={name} value={withFocal(value, focal)} />
 
       <input
         ref={fileRef}
@@ -136,7 +167,25 @@ export function ImageField({
           src={value}
           alt="Vista previa"
           className={previewClass}
+          style={{
+            objectPosition: `${focal.x}% ${focal.y}%`,
+            transform: focal.z === 1 ? undefined : `scale(${focal.z})`,
+            transformOrigin: `${focal.x}% ${focal.y}%`,
+          }}
           onError={() => setError("No se puede mostrar esa imagen. Revisá la URL.")}
+        />
+      ) : null}
+
+      {editando && value && usos?.length ? (
+        <EditorEncuadre
+          src={value}
+          focal={focal}
+          usos={usos}
+          onAplicar={(f) => {
+            setFocal(f);
+            setEditando(false);
+          }}
+          onCerrar={() => setEditando(false)}
         />
       ) : null}
     </div>

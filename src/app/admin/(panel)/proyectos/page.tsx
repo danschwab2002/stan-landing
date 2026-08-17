@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Img } from "@/components/landing/Img";
 import { getAllProjects } from "@/lib/data/projects";
 import { setFlag } from "@/app/admin/actions";
 import { DeleteButton } from "@/components/admin/DeleteButton";
@@ -75,14 +76,7 @@ export default async function ProyectosPage() {
               <tr key={p.id} className="border-b border-black/5 last:border-0">
                 <td className="px-4 py-3">
                   <div className="h-13 w-10 overflow-hidden rounded bg-black/10">
-                    {p.coverUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={p.coverUrl}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : null}
+                    <Img value={p.coverUrl} />
                   </div>
                 </td>
                 <td className="px-4 py-3">

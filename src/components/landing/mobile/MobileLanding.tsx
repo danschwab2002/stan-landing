@@ -8,6 +8,7 @@ import { openCalendly } from "../calendly";
 import { SITE, relatedCaso, disciplineTitle, casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
 import { instagramHandle } from "@/lib/instagram";
 import type { SiteSettings } from "@/lib/data/settings";
+import { Img } from "../Img";
 
 type SectionKey = "hero" | "work" | "casos" | "manifesto" | "contact";
 
@@ -148,7 +149,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
                 <h3 style={s("font-family:var(--font-grotesk);font-weight:900;font-size:26px;letter-spacing:-0.01em;line-height:1;margin:0 0 16px;color:var(--stan-acid)")}>{d.title}</h3>
                 <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:18px")}>
                   {d.image ? (
-                    <img src={d.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                    <Img value={d.image} />
                   ) : null}
                 </div>
                 <p style={s("font-size:17px;line-height:1.5;color:rgba(245,243,236,0.84);margin:0")}>{d.desc}</p>
@@ -180,7 +181,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
               <div style={s("position:relative;border-radius:16px;overflow:hidden;background:#1a1a1a;aspect-ratio:3/4")}>
                 <div style={s("position:absolute;inset:0")}>
                   {c.cover ? (
-                    <img src={c.cover} alt={c.title} style={s("width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
+                    <Img value={c.cover} alt={c.title} />
                   ) : null}
                 </div>
                 <div style={s("position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(13,13,13,0) 40%,rgba(13,13,13,0.9) 100%)")} />
@@ -402,7 +403,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
                       <h3 style={s("margin:0 0 12px;font-weight:700;font-size:19px;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
                       <div style={s("aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#1a1a1a;margin-bottom:12px")}>
                         {item.image ? (
-                          <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                          <Img value={item.image} />
                         ) : null}
                       </div>
                       <p style={s("font-size:15px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
@@ -435,7 +436,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
                       >
                         <div style={s("position:relative;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a;margin-bottom:14px")}>
                           {c.cover ? (
-                            <img src={c.cover} alt={c.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
+                            <Img value={c.cover} alt={c.title} extra="position:absolute;inset:0" />
                           ) : null}
                           <div style={s("position:absolute;inset:0;display:flex;align-items:center;justify-content:center")}>
                             <span style={s("display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:999px;background:rgba(13,13,13,0.34)")}>
@@ -581,7 +582,7 @@ export function MobileLanding({ casos, areaCasos, disciplines, settings }: { cas
                       >
                         <div style={s("position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#1a1a1a")}>
                           {rc.cover ? (
-                            <img src={rc.cover} alt={rc.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
+                            <Img value={rc.cover} alt={rc.title} extra="position:absolute;inset:0" />
                           ) : null}
                           <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 44%,rgba(13,13,13,0.9) 100%)")} />
                           <div style={s("position:absolute;left:0;right:0;bottom:0;padding:16px")}>

@@ -1,6 +1,7 @@
 import { s } from "../style";
 import { PlayCircle } from "../icons";
 import { SITE, type Caso } from "@/lib/landing-data";
+import { Img } from "../Img";
 
 const VTITLE = "writing-mode:vertical-rl;font-family:Bootzy;font-weight:400;font-size:clamp(40px,5.4vw,88px);letter-spacing:0.04em;text-transform:uppercase;color:#f5f3ec";
 
@@ -31,7 +32,7 @@ export function Casos({ casos, onOpen }: { casos: Caso[]; onOpen: (key: string) 
             >
               <div style={s("position:absolute;inset:0;pointer-events:none")}>
                 {c.cover ? (
-                  <img src={c.cover} alt={c.title} style={s("width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
+                  <Img value={c.cover} alt={c.title} />
                 ) : null}
               </div>
               <div style={s("position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(13,13,13,0) 42%,rgba(13,13,13,0.88) 100%)")} />

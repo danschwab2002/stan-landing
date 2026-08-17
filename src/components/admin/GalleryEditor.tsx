@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImageField } from "@/components/admin/ImageField";
+import { USO_GALERIA } from "@/lib/image-usos";
 
 /** Fila con identidad local estable: sin una `key` que sobreviva al reordenamiento,
  *  el estado interno de cada `ImageField` sigue a la posición en vez de a su imagen
@@ -90,6 +91,7 @@ export function GalleryEditor({ initial }: { initial: string[] }) {
             name="galleryImage"
             label="Imagen"
             defaultValue={row.url}
+            usos={USO_GALERIA}
             hint="Horizontal, se recorta a 16:9."
             previewClass="mt-2 aspect-[16/9] w-56 rounded-lg object-cover"
           />

@@ -6,6 +6,7 @@ import {
   type ProjectOption,
 } from "@/components/admin/DetailCardsEditor";
 import { ImageField } from "@/components/admin/ImageField";
+import { USO_IMAGEN_AREA } from "@/lib/image-usos";
 import type { DisciplineRow } from "@/lib/db/schema";
 
 const inputCls =
@@ -91,6 +92,7 @@ export function DisciplineForm({
           name="image"
           label="Imagen del área"
           defaultValue={d?.image}
+          usos={USO_IMAGEN_AREA}
           hint="La imagen grande del recuadro del área en “Qué hacemos”. Si la dejás vacía, queda el recuadro gris."
         />
         <div>

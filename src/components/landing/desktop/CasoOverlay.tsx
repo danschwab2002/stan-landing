@@ -3,6 +3,7 @@ import { s } from "../style";
 import { CasoVideo } from "../CasoVideo";
 import { ArrowLeft, ArrowRight } from "../icons";
 import { disciplineTitle, type Caso, type Discipline } from "@/lib/landing-data";
+import { Img } from "../Img";
 
 const VTITLE = "writing-mode:vertical-rl;font-family:Bootzy;font-weight:400;font-size:clamp(38px,7vh,80px);letter-spacing:0.04em;text-transform:uppercase;color:#f5f3ec";
 
@@ -151,12 +152,10 @@ export function CasoOverlay({
           <div style={s("display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.4vw,22px)")}>
             {caso.gallery.map((src, i) => (
               <div key={src} style={s("border-radius:0;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a")}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={src}
+                <Img
+                  value={src}
                   alt={`${caso.title} — still ${i + 1}`}
                   loading="lazy"
-                  style={s("width:100%;height:100%;object-fit:cover;display:block")}
                 />
               </div>
             ))}
@@ -186,7 +185,7 @@ export function CasoOverlay({
                   style={s("position:relative;display:block;padding:0;border:none;background:#1a1a1a;overflow:hidden;aspect-ratio:16/9;cursor:pointer;text-align:left")}
                 >
                   {rc.cover ? (
-                    <img src={rc.cover} alt={rc.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block")} />
+                    <Img value={rc.cover} alt={rc.title} extra="position:absolute;inset:0" />
                   ) : null}
                   <div style={s("position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,13,0) 42%,rgba(13,13,13,0.9) 100%)")} />
                   <div style={s("position:absolute;left:0;right:0;bottom:0;padding:clamp(14px,1.6vw,24px)")}>

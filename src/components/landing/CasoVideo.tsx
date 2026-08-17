@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { PlayCircle } from "./icons";
 import { s } from "./style";
+import { Img } from "./Img";
+import { parseFocal } from "@/lib/focal";
 
 /**
  * El video de un caso: portada con CTA de play, y al clickear, reproducción.
@@ -79,7 +81,7 @@ export function CasoVideo({
         ) : (
           <video
             src={embed.src}
-            poster={cover}
+            poster={parseFocal(cover).src || undefined}
             controls
             autoPlay
             playsInline
@@ -93,11 +95,7 @@ export function CasoVideo({
   return (
     <div style={s(frame)}>
       {cover ? (
-        <img
-          src={cover}
-          alt={title}
-          style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block")}
-        />
+        <Img value={cover} alt={title} extra="position:absolute;inset:0" />
       ) : null}
 
       {video ? (

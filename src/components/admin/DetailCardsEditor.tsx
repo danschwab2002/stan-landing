@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImageField } from "@/components/admin/ImageField";
+import { USO_TARJETA_DETALLE } from "@/lib/image-usos";
 
 const inputCls =
   "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#16170f]";
@@ -122,6 +123,7 @@ export function DetailCardsEditor({
               name="detailImage"
               label="Imagen"
               defaultValue={row.image ?? ""}
+              usos={USO_TARJETA_DETALLE}
               hint="Opcional. Si la dejás vacía, la tarjeta muestra el recuadro gris."
               previewClass="mt-2 aspect-[4/3] w-44 rounded-lg object-cover"
             />

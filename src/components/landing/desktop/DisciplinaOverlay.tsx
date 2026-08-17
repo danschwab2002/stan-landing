@@ -2,6 +2,7 @@ import { s } from "../style";
 import { ArrowLeft, ArrowRight, ChevronDown, PlayCircle } from "../icons";
 import { Marquee } from "./Marquee";
 import { casosByDiscipline, MAX_CASOS_AREA, type Caso, type Discipline } from "@/lib/landing-data";
+import { Img } from "../Img";
 
 /** Ancla del bloque de casos, destino del botón "Ver casos destacados".
  *  Los árboles desktop y mobile conviven en el DOM (se alternan por media
@@ -85,7 +86,7 @@ export function DisciplinaOverlay({
                   <h3 style={s("margin:0 0 22px;font-family:var(--font-grotesk);font-weight:700;font-size:clamp(16px,1.35vw,21px);letter-spacing:0.005em;text-transform:uppercase;color:#f5f3ec")}>{item.title}</h3>
                   <div style={s("border-radius:clamp(9px,1vw,14px);overflow:hidden;aspect-ratio:4/3;background:#1a1a1a;margin-bottom:20px")}>
                     {item.image ? (
-                      <img src={item.image} alt="" style={s("width:100%;height:100%;object-fit:cover;display:block")} />
+                      <Img value={item.image} />
                     ) : null}
                   </div>
                   <p style={s("font-size:13px;line-height:1.5;color:rgba(245,243,236,0.72);margin:0")}>{item.desc}</p>
@@ -135,7 +136,7 @@ export function DisciplinaOverlay({
 
                   <div style={s("position:relative;aspect-ratio:12/5;background:#1a1a1a;overflow:hidden")}>
                     {c.cover ? (
-                      <img src={c.cover} alt={c.title} style={s("position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block")} />
+                      <Img value={c.cover} alt={c.title} extra="position:absolute;inset:0" />
                     ) : null}
                     <div style={s("position:absolute;inset:0;display:flex;align-items:center;justify-content:center")}>
                       <span style={s("display:inline-flex;align-items:center;justify-content:center;width:clamp(44px,4vw,60px);height:clamp(44px,4vw,60px);border-radius:999px;background:rgba(13,13,13,0.34);backdrop-filter:blur(2px)")}>
